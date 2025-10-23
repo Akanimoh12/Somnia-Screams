@@ -1,2 +1,43 @@
 halloween-structure.md
 README.md
+
+
+
+# Environment files (NEVER commit these!)
+.env
+.env.local
+.env.*.local
+
+# Private keys and secrets
+*.key
+*.pem
+secrets/
+
+# Build outputs
+**/out/
+**/cache/
+**/artifacts/
+**/typechain/
+**/typechain-types/
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Deployment addresses (optional - commit if you want to share)
+deployments/localhost/
+broadcast/
