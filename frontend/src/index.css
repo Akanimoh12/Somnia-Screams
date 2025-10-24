@@ -1,1 +1,148 @@
-@import "tailwindcss"; 
+@import "tailwindcss";
+
+/* Halloween Fonts - Gaming Style */
+@import url('https://fonts.googleapis.com/css2?family=Creepster&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nosifer&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Butcherman&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Eater&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Metal+Mania&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rubik+Burned&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rubik+Glitch&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lacquer&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap');
+
+/* CSS Variables - Halloween Theme */
+:root {
+  /* Primary Colors */
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #1a1a1a;
+  --bg-card: #151515;
+  --accent-orange: #ff6b35;
+  --accent-purple: #6a0dad;
+  --accent-red: #dc2626;
+  
+  /* UI Colors */
+  --text-primary: #ffffff;
+  --text-secondary: #cccccc;
+  --text-muted: #888888;
+  --border-color: #333333;
+  --border-glow: #ff6b35;
+  
+  /* Status Colors */
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --info: #3b82f6;
+  
+  /* Effects */
+  --shadow-glow: rgba(255, 107, 53, 0.3);
+  --shadow-purple: rgba(106, 13, 173, 0.2);
+  --shadow-dark: rgba(0, 0, 0, 0.8);
+}
+
+/* Base Styles */
+body {
+  margin: 0;
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+/* Font Classes */
+.title-font {
+  font-family: 'Creepster', cursive;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-weight: 900;
+}
+
+.fire-font {
+  font-family: 'Rubik Burned', cursive;
+  letter-spacing: 2px;
+  font-weight: 900;
+}
+
+.glitch-font {
+  font-family: 'Rubik Glitch', cursive;
+  letter-spacing: 2px;
+  font-weight: 900;
+}
+
+.metal-font {
+  font-family: 'Metal Mania', cursive;
+  letter-spacing: 2px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.header-font {
+  font-family: 'Nosifer', cursive;
+  letter-spacing: 2px;
+  font-weight: 900;
+}
+
+.eater-font {
+  font-family: 'Eater', cursive;
+  letter-spacing: 1.5px;
+  font-weight: 900;
+}
+
+.body-font {
+  font-family: 'Butcherman', serif;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+}
+
+.ui-font {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+}
+
+.stat-font {
+  font-family: 'Lacquer', cursive;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+/* Text Effects */
+.stroke-text {
+  -webkit-text-stroke: 2px #000;
+  text-stroke: 2px #000;
+  paint-order: stroke fill;
+}
+
+.glow-text {
+  animation: textGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes textGlow {
+  from {
+    text-shadow: 
+      0 0 10px #ff6b35,
+      0 0 20px #ff6b35,
+      0 0 30px #ff6b35;
+  }
+  to {
+    text-shadow: 
+      0 0 20px #ff4500,
+      0 0 30px #ff4500,
+      0 0 40px #ff4500,
+      0 0 50px #ff0000;
+  }
+}
+
+@keyframes glitch {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(-2px, -2px); }
+  60% { transform: translate(2px, 2px); }
+  80% { transform: translate(2px, -2px); }
+  100% { transform: translate(0); }
+} 
