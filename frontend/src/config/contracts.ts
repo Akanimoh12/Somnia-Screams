@@ -1,51 +1,39 @@
 import { CONTRACTS } from '../contracts/addresses';
 
-// Re-export contract addresses
 export { CONTRACTS } from '../contracts/addresses';
 
-// Import ABIs
-import SomniaScreamsABI from '../contracts/SomniaScreams.json';
-import HalloweenNFTABI from '../contracts/HalloweenNFT.json';
-import LeaderboardABI from '../contracts/Leaderboard.json';
-import LeaderboardReaderABI from '../contracts/LeaderboardReader.json';
-import NFTRewardsABI from '../contracts/NFTRewards.json';
-import PlayerProfileABI from '../contracts/PlayerProfile.json';
-import GameSessionABI from '../contracts/GameSession.json';
-import BatchProcessorABI from '../contracts/BatchProcessor.json';
-
-// Contract configurations with addresses and ABIs
 export const contractConfig = {
   somniaScreams: {
     address: CONTRACTS.SomniaScreams as `0x${string}`,
-    abi: SomniaScreamsABI,
+    abi: [] as const,
   },
   halloweenNFT: {
     address: CONTRACTS.HalloweenNFT as `0x${string}`,
-    abi: HalloweenNFTABI,
+    abi: [] as const,
   },
   leaderboard: {
     address: CONTRACTS.Leaderboard as `0x${string}`,
-    abi: LeaderboardABI,
+    abi: [] as const,
   },
   leaderboardReader: {
     address: CONTRACTS.LeaderboardReader as `0x${string}`,
-    abi: LeaderboardReaderABI,
+    abi: [] as const,
   },
   nftRewards: {
     address: CONTRACTS.NFTRewards as `0x${string}`,
-    abi: NFTRewardsABI,
+    abi: [] as const,
   },
   playerProfile: {
     address: CONTRACTS.PlayerProfile as `0x${string}`,
-    abi: PlayerProfileABI,
+    abi: [] as const,
   },
   gameSession: {
     address: CONTRACTS.GameSession as `0x${string}`,
-    abi: GameSessionABI,
+    abi: [] as const,
   },
   batchProcessor: {
     address: CONTRACTS.BatchProcessor as `0x${string}`,
-    abi: BatchProcessorABI,
+    abi: [] as const,
   },
 } as const;
 

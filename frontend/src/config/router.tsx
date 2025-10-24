@@ -1,63 +1,91 @@
+import { lazy, Suspense } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { ROUTES } from '../utils/constants';
+import { Skeleton } from '../components/ui/Skeleton';
+import GameLayout from '../components/layout/GameLayout';
 
-// Pages
-import LandingPage from '../pages/LandingPage';
-import Dashboard from '../pages/Dashboard';
-import GameArena from '../pages/GameArena';
-import LeaderboardPage from '../pages/LeaderboardPage';
-import ProfilePage from '../pages/ProfilePage';
-import InventoryPage from '../pages/InventoryPage';
-import AchievementsPage from '../pages/AchievementsPage';
-import HowToPlayPage from '../pages/HowToPlayPage';
-import SettingsPage from '../pages/SettingsPage';
-import NotFoundPage from '../pages/NotFoundPage';
+const LandingPage = lazy(() => import('../pages/LandingPage'));
+const Dashboard = lazy(() => import('../pages/Dashboard'));
+const GameArena = lazy(() => import('../pages/GameArena'));
+const LeaderboardPage = lazy(() => import('../pages/LeaderboardPage'));
+const ProfilePage = lazy(() => import('../pages/ProfilePage'));
+const InventoryPage = lazy(() => import('../pages/InventoryPage'));
+const AchievementsPage = lazy(() => import('../pages/AchievementsPage'));
+const HowToPlayPage = lazy(() => import('../pages/HowToPlayPage'));
+const SettingsPage = lazy(() => import('../pages/SettingsPage'));
+const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
 
-// Router configuration
+const PageLoader = () => (
+  <div className="min-h-screen bg-primary flex items-center justify-center p-6">
+    <div className="w-full max-w-4xl space-y-4">
+      <Skeleton height={200} />
+      <Skeleton height={400} />
+    </div>
+  </div>
+);
+
+const withSuspense = (Component: React.LazyExoticComponent<React.ComponentType<any>>) => (
+  <Suspense fallback={<PageLoader />}>
+    <Component />
+  </Suspense>
+);
+
+const withLayout = (
+  Component: React.LazyExoticComponent<React.ComponentType<any>>, 
+  requireAuth = false,
+  showSidebar = true,
+  showFooter = false
+) => (
+  <Suspense fallback={<PageLoader />}>
+    <GameLayout requireAuth={requireAuth} showSidebar={showSidebar} showFooter={showFooter}>
+      <Component />
+    </GameLayout>
+  </Suspense>
+);
+
 export const router = createBrowserRouter([
   {
     path: ROUTES.HOME,
-    element: <LandingPage />,
+    element: withSuspense(LandingPage),
   },
   {
     path: ROUTES.DASHBOARD,
-    element: <Dashboard />,
+    element: withLayout(Dashboard, true, true, false),
   },
   {
     path: ROUTES.GAME,
-    element: <GameArena />,
+    element: withLayout(GameArena, true, false, false),
   },
   {
     path: ROUTES.LEADERBOARD,
-    element: <LeaderboardPage />,
+    element: withLayout(LeaderboardPage, false, true, false),
   },
   {
     path: ROUTES.PROFILE,
-    element: <ProfilePage />,
+    element: withLayout(ProfilePage, true, true, false),
   },
   {
     path: ROUTES.INVENTORY,
-    element: <InventoryPage />,
+    element: withLayout(InventoryPage, true, true, false),
   },
   {
     path: ROUTES.ACHIEVEMENTS,
-    element: <AchievementsPage />,
+    element: withLayout(AchievementsPage, false, true, false),
   },
   {
     path: ROUTES.HOW_TO_PLAY,
-    element: <HowToPlayPage />,
+    element: withLayout(HowToPlayPage, false, true, true),
   },
   {
     path: ROUTES.SETTINGS,
-    element: <SettingsPage />,
+    element: withLayout(SettingsPage, true, true, false),
   },
   {
     path: '*',
-    element: <NotFoundPage />,
+    element: withSuspense(NotFoundPage),
   },
 ]);
 
-// Router component
 export function AppRouter() {
   return <RouterProvider router={router} />;
 }

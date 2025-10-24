@@ -1,38 +1,46 @@
 // Player types
-export interface Player {
+export interface PlayerStats {
   address: string;
   level: number;
   experience: number;
-  points: number;
-  souls: number;
+  totalPoints: number;
+  totalSouls: number;
   battlesWon: number;
   roomsExplored: number;
   nftsOwned: number[];
 }
 
 export interface PlayerProfile {
-  player: Player;
-  achievements: number[];
+  stats: PlayerStats;
+  achievements: Achievement[];
   inventory: PlayerInventory;
 }
 
 export interface PlayerInventory {
   souls: number;
   powerUps: PowerUp[];
-  items: Item[];
+  items: GameItem[];
 }
 
 export interface PowerUp {
   id: number;
   name: string;
+  description: string;
   expiry: number;
   active: boolean;
 }
 
-export interface Item {
+export interface GameItem {
   id: number;
   name: string;
   quantity: number;
+  type: 'CONSUMABLE' | 'POWER_UP' | 'COLLECTIBLE';
 }
 
-// Add more player types here
+export interface Achievement {
+  id: number;
+  name: string;
+  description: string;
+  unlocked: boolean;
+  timestamp?: number;
+}

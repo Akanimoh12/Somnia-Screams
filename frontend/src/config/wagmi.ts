@@ -1,10 +1,9 @@
 import { getDefaultConfig } from '@rainbow-me/rainbowkit';
 import { somniaDevnet } from './chains';
 
-// Wagmi configuration for Somnia Screams
 export const wagmiConfig = getDefaultConfig({
   appName: 'Somnia Screams',
-  projectId: process.env.VITE_WALLETCONNECT_PROJECT_ID || 'YOUR_PROJECT_ID',
+  projectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || '8fa4b535784defa6b860ee8c1dac3306',
   chains: [somniaDevnet],
   ssr: false,
 });

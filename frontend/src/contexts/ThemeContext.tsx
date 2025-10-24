@@ -1,13 +1,12 @@
-import { createContext, useContext, ReactNode } from 'react';
+import { createContext, useContext } from 'react';
+import type { ReactNode } from 'react';
 
-// Halloween theme settings
 interface ThemeContextType {
-  // Theme settings will be defined here
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
+export function ThemeProvider({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <ThemeContext.Provider value={{}}>
       {children}
