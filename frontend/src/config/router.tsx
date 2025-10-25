@@ -57,6 +57,10 @@ export const router = createBrowserRouter([
     element: withLayout(GameArena, false, false, false), // Allow access without wallet
   },
   {
+    path: '/game-arena', // Legacy redirect for old bookmarks/cache
+    element: withLayout(GameArena, false, false, false),
+  },
+  {
     path: ROUTES.LEADERBOARD,
     element: withLayout(LeaderboardPage, false, true, false),
   },

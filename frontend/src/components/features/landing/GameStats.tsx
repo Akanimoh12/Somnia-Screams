@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Users, Skull, Zap, Flame } from 'lucide-react';
+import { useGameStats } from '../../../hooks/useGameStats';
 
 interface StatItem {
   id: string;
@@ -101,12 +102,34 @@ function StatCard({ stat, delay, inView }: { stat: StatItem; delay: number; inVi
 export default function GameStats() {
   const [inView, setInView] = useState(false);
 
-  // Mock stats - In production, these would come from smart contract queries
+  // Get real data from GameState contract
+  const { 
+    totalPlayers, 
+    totalSoulsCollected, 
+    activeSessions, 
+    isLoading,
+    isInMaintenance 
+  } = useGameStats();
+
+  // NFT count - will be available when NFT minting is integrated
+  const nftsMinted = 0;
+
+  // Format souls (display in thousands if > 1000)
+  const formatSouls = (souls: number) => {
+    if (souls >= 1000) {
+      return { value: Math.floor(souls / 1000), suffix: 'K' };
+    }
+    return { value: souls, suffix: '' };
+  };
+
+  const soulsData = formatSouls(totalSoulsCollected);
+
+  // Stats array with real data
   const stats: StatItem[] = [
     {
       id: 'players',
       label: 'Total Players',
-      value: 12847,
+      value: totalPlayers,
       suffix: '',
       icon: Users,
       color: 'text-accent-purple',
@@ -115,8 +138,8 @@ export default function GameStats() {
     {
       id: 'souls',
       label: 'Souls Collected',
-      value: 2456,
-      suffix: 'K',
+      value: soulsData.value,
+      suffix: soulsData.suffix,
       icon: Skull,
       color: 'text-accent-red',
       description: 'Total souls hunted by all players',
@@ -124,7 +147,7 @@ export default function GameStats() {
     {
       id: 'nfts',
       label: 'NFTs Minted',
-      value: 8392,
+      value: nftsMinted,
       suffix: '',
       icon: Zap,
       color: 'text-accent-orange',
@@ -133,7 +156,7 @@ export default function GameStats() {
     {
       id: 'sessions',
       label: 'Active Sessions',
-      value: 423,
+      value: activeSessions,
       suffix: '',
       icon: Flame,
       color: 'text-success',
@@ -180,15 +203,47 @@ export default function GameStats() {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-          {stats.map((stat, index) => (
-            <StatCard
-              key={stat.id}
-              stat={stat}
-              delay={index * 0.1}
-              inView={inView}
-            />
-          ))}
+          {isLoading ? (
+            // Loading skeleton
+            Array.from({ length: 4 }).map((_, index) => (
+              <div
+                key={index}
+                className="bg-bg-card border-2 border-border-color rounded-lg p-8 animate-pulse"
+              >
+                <div className="h-12 w-12 bg-border-color rounded mb-6" />
+                <div className="h-12 bg-border-color rounded mb-3 w-3/4" />
+                <div className="h-6 bg-border-color rounded mb-2 w-1/2" />
+                <div className="h-4 bg-border-color rounded w-full" />
+              </div>
+            ))
+          ) : (
+            stats.map((stat, index) => (
+              <StatCard
+                key={stat.id}
+                stat={stat}
+                delay={index * 0.1}
+                inView={inView}
+              />
+            ))
+          )}
         </div>
+
+        {/* Maintenance Mode Warning */}
+        {isInMaintenance && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-8 bg-accent-orange/10 border-2 border-accent-orange rounded-lg p-6 text-center"
+          >
+            <Flame className="w-8 h-8 text-accent-orange mx-auto mb-3" />
+            <p className="metal-font text-lg text-accent-orange mb-2">
+              ⚠️ MAINTENANCE MODE
+            </p>
+            <p className="ui-font text-sm text-text-secondary">
+              The game is currently under maintenance. Please check back soon!
+            </p>
+          </motion.div>
+        )}
 
         {/* Additional Info */}
         <motion.div
@@ -204,7 +259,7 @@ export default function GameStats() {
           <div className="flex items-center justify-center gap-2">
             <div className="w-2 h-2 bg-accent-orange rounded-full animate-pulse" />
             <span className="metal-font text-sm text-text-primary">
-              Data refreshed every 10 seconds
+              Data refreshed every 30 seconds
             </span>
           </div>
         </motion.div>

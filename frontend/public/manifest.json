@@ -80,7 +80,7 @@
     },
     {
       "name": "Play Game",
-      "url": "/game-arena",
+      "url": "/game",
       "description": "Start a new game session"
     },
     {

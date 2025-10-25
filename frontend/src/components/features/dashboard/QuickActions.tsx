@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Gamepad2, Trophy, Users, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '../../../utils/constants';
 
 export default function QuickActions() {
   const navigate = useNavigate();
@@ -11,28 +12,28 @@ export default function QuickActions() {
       description: 'Start a new game session',
       icon: Gamepad2,
       color: 'from-accent-orange to-accent-red',
-      onClick: () => navigate('/game-arena')
+      onClick: () => navigate(ROUTES.GAME)
     },
     {
       label: 'Leaderboard',
       description: 'View top players',
       icon: Trophy,
       color: 'from-accent-purple to-accent-orange',
-      onClick: () => navigate('/leaderboard')
+      onClick: () => navigate(ROUTES.LEADERBOARD)
     },
     {
       label: 'Achievements',
       description: 'Track your progress',
       icon: Users,
       color: 'from-success to-accent-purple',
-      onClick: () => navigate('/achievements')
+      onClick: () => navigate(ROUTES.ACHIEVEMENTS)
     },
     {
       label: 'Settings',
       description: 'Configure preferences',
       icon: Settings,
       color: 'from-accent-red to-accent-purple',
-      onClick: () => navigate('/settings')
+      onClick: () => navigate(ROUTES.SETTINGS)
     }
   ];
 

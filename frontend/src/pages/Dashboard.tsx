@@ -6,6 +6,7 @@ import PlayerStats from '../components/features/dashboard/PlayerStats';
 import QuickActions from '../components/features/dashboard/QuickActions';
 import RecentActivity from '../components/features/dashboard/RecentActivity';
 import Inventory from '../components/features/dashboard/Inventory';
+import DailyQuests from '../components/features/dashboard/DailyQuests';
 import ProgressTracker from '../components/features/rewards/ProgressTracker';
 import AchievementsList from '../components/features/rewards/AchievementsList';
 
@@ -77,6 +78,14 @@ export default function Dashboard() {
         transition={{ delay: 0.3 }}
       >
         <QuickActions />
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.35 }}
+      >
+        <DailyQuests />
       </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

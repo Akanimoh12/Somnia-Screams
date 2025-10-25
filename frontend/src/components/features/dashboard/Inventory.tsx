@@ -1,62 +1,13 @@
 import { motion } from 'framer-motion';
 import { Package, Sparkles, Zap, X } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import type { PlayerInventory } from '../../../types/player';
+import { useState } from 'react';
+import { useAccount } from 'wagmi';
+import { useInventory } from '../../../hooks/useInventory';
 
 export default function Inventory() {
-  const [inventory, setInventory] = useState<PlayerInventory | null>(null);
+  const { address } = useAccount();
+  const { inventory } = useInventory();
   const [selectedTab, setSelectedTab] = useState<'souls' | 'powerups' | 'items'>('souls');
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchInventory = () => {
-      const mockInventory: PlayerInventory = {
-        souls: 1250,
-        powerUps: [
-          {
-            id: 1,
-            name: 'Speed Boost',
-            description: '+20% movement speed',
-            expiry: Date.now() + 3600000,
-            active: true
-          },
-          {
-            id: 2,
-            name: 'Soul Magnet',
-            description: 'Auto-collect nearby souls',
-            expiry: Date.now() + 7200000,
-            active: false
-          }
-        ],
-        items: [
-          {
-            id: 1,
-            name: 'Health Potion',
-            quantity: 5,
-            type: 'CONSUMABLE'
-          },
-          {
-            id: 2,
-            name: 'Lucky Charm',
-            quantity: 2,
-            type: 'POWER_UP'
-          },
-          {
-            id: 3,
-            name: 'Ancient Key',
-            quantity: 1,
-            type: 'COLLECTIBLE'
-          }
-        ]
-      };
-      setInventory(mockInventory);
-      setLoading(false);
-    };
-
-    fetchInventory();
-    const interval = setInterval(fetchInventory, 30000);
-    return () => clearInterval(interval);
-  }, []);
 
   const tabs = [
     { id: 'souls', label: 'Souls', icon: Sparkles },
@@ -71,10 +22,15 @@ export default function Inventory() {
     return `${hours}h ${minutes}m`;
   };
 
-  if (loading) {
+  if (!address) {
     return (
-      <div className="bg-bg-card border-2 border-border-color rounded-lg p-6 animate-pulse">
-        <div className="h-64 bg-bg-secondary rounded" />
+      <div className="bg-bg-card border-2 border-border-color rounded-lg p-6">
+        <div className="text-center py-8">
+          <Package className="w-12 h-12 text-text-muted mx-auto mb-3" />
+          <p className="text-sm ui-font text-text-secondary">
+            Connect wallet to view inventory
+          </p>
+        </div>
       </div>
     );
   }

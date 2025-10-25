@@ -1,0 +1,32 @@
+{
+  "network": "somnia-testnet",
+  "chainId": 50312,
+  "deployedAt": "1761376109",
+  "deployer": "0x58C25c26666B31241C67Cf7B9a82e325eB07c342",
+  "contracts": {
+    "SomniaScreams": "0xff7A1Fc64479B23Bc58242fcd0A7E31c32fd8210",
+    "HalloweenNFT": "0xE27d23b5eFBEadD0472015E09aC261FfCF735f46",
+    "Leaderboard": "0x6209E7e76DaCAA78c08418ECb58e3543a32b5B9f",
+    "LeaderboardReader": "0x5D3D7E69dc9346E01DC0e4F32c72D04816fF7739",
+    "NFTRewards": "0x81c8B4B290B46F1cb216131467753401CD3bebf5",
+    "PlayerRegistry": "0xbE493EFCbF4Cd9dE96a4eFb9517657ecB552c67f",
+    "PlayerProfile": "0xF946a1fCEC7690E64FB736Db450Ef9F0A3185Ee5",
+    "PlayerActions": "0xfE8982c7FE17C0f701ECf4572565A77C07487c07",
+    "PlayerInventory": "0x0c0304420e2A57AF0515f57CA84f52106a0Ceb87",
+    "HauntedRooms": "0x53f143818DC2A64f518B58f16dA56Fc57F62213e",
+    "SpectralBattles": "0xc0b8887689a21CA0247B09a1f585A6C800F85118",
+    "SoulCollector": "0x633d038e52Bab22a040A440CE8c90955A192c9D1",
+    "DailyQuests": "0x1422e7186F64C976054bdF5B677D48F4b099DA59",
+    "BatchProcessor": "0x03340b1B7Dab6CB6e54FE1493E2a6acA00618D17",
+    "PointsSystem": "0xb6022e801b3C4C23E16318830774592F9a02093C",
+    "SeasonalRewards": "0x06E62E6DcA1585304368DC9204E7cE2E686de923",
+    "GameState": "0x6F6F1b73D6D4A2cf2da5dE91a96522Ae6B3Fdc47",
+    "GameSession": "0x29ab45f6F3D4002181B7192D05fc3C828aa821A5",
+    "NFTTiers": "0x3130B1F67CDdE19262342B2b6Cfd542A26d1E493",
+    "NFTMetadata": "0xdfC708375193E65dc774d9a156Cc3B4D7735C071"
+  },
+  "initialized": true,
+  "transactionHashes": {
+    "note": "All contracts deployed and initialized successfully via forge script with --broadcast flag"
+  }
+}

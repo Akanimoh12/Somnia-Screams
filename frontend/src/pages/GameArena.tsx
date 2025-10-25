@@ -13,41 +13,60 @@ import TransactionQueue from '../components/web3/TransactionQueue';
 import { useGameSession } from '../hooks/useGameSession';
 import { usePlayerStats } from '../hooks/usePlayerStats';
 import { useTransactionQueue } from '../hooks/useTransactionQueue';
-import type { Room, Battle } from '../types/game';
+import { useBattles } from '../hooks/useBattles';
+import { useRooms } from '../hooks/useRooms';
 
-const MOCK_ROOMS: Room[] = [
-  { id: 1, name: 'Haunted Library', difficulty: 1, souls: 10, explored: false, description: 'Ancient tomes whisper forgotten secrets' },
-  { id: 2, name: 'Cursed Ballroom', difficulty: 2, souls: 15, explored: false, description: 'Ghostly dancers waltz eternally' },
-  { id: 3, name: 'Dark Cellar', difficulty: 3, souls: 20, explored: false, description: 'Shadows move with malicious intent' }
-];
+// Available room IDs (1-50 based on MAX_ROOMS constant in contract)
+const AVAILABLE_ROOM_IDS = [1, 2, 3, 4, 5];
 
 export default function GameArena() {
   const navigate = useNavigate();
   const { address, isConnected } = useAccount();
-  const { session, timeRemaining, startSession, collectSoul, takeDamage, endSession } = useGameSession();
+  const { session, timeRemaining, startSession, collectSoul } = useGameSession();
   const { stats, fetchStats } = usePlayerStats();
   const { queue, addTransaction, clearQueue } = useTransactionQueue();
   
-  const [currentRoom, setCurrentRoom] = useState<Room | null>(null);
-  const [battle, setBattle] = useState<Battle | null>(null);
+  // Real battle system from blockchain
+  const { 
+    isInBattle, 
+    activeBattleId, 
+    battleData, 
+    battleStats,
+    startBattle, 
+    resolveBattle,
+    isStarting,
+    isResolving 
+  } = useBattles();
+
+  // Real rooms system from blockchain
+  const { 
+    roomData, 
+    selectedRoomId, 
+    setSelectedRoomId, 
+    enterRoom, 
+    roomHistory 
+  } = useRooms();
+  
+  const [currentRoomId, setCurrentRoomId] = useState<number | null>(null);
   const [showConnectPrompt, setShowConnectPrompt] = useState(false);
+  const [battleResolved, setBattleResolved] = useState(false);
 
   useEffect(() => {
     fetchStats();
   }, [fetchStats]);
 
+  // Auto-start battle when entering BATTLE phase and not already in battle
   useEffect(() => {
-    if (session?.phase === 'BATTLE' && !battle) {
-      setBattle({
-        id: `battle-${Date.now()}`,
-        opponentHealth: 100,
-        playerHealth: session.health,
-        playerDamage: 10,
-        opponentDamage: 15,
-        active: true
-      });
+    const shouldStartBattle = session?.phase === 'BATTLE' && 
+                              !isInBattle && 
+                              !isStarting && 
+                              currentRoomId !== null &&
+                              !battleResolved;
+    
+    if (shouldStartBattle) {
+      handleStartBattle(BigInt(currentRoomId!));
     }
-  }, [session?.phase, battle, session?.health]);
+  }, [session?.phase, isInBattle, isStarting, currentRoomId, battleResolved]);
 
   const handleStartSession = async (roomId: number) => {
     if (!isConnected) {
@@ -55,40 +74,54 @@ export default function GameArena() {
       return;
     }
 
-    const room = MOCK_ROOMS.find(r => r.id === roomId);
-    if (!room) return;
-
-    setCurrentRoom(room);
+    setCurrentRoomId(roomId);
+    setSelectedRoomId(BigInt(roomId));
+    setBattleResolved(false);
+    
+    // Enter room on blockchain
+    try {
+      await enterRoom(BigInt(roomId));
+      addTransaction('START_SESSION', { roomId }, 'HIGH');
+    } catch (error) {
+      console.error('Failed to enter room:', error);
+    }
+    
+    // Start game session
     await startSession();
-    addTransaction('START_SESSION', { roomId }, 'HIGH');
+  };
+
+  const handleStartBattle = async (roomId: bigint) => {
+    if (!address || isStarting) return;
+    
+    try {
+      await startBattle(roomId);
+      addTransaction('START_BATTLE', { roomId: Number(roomId) }, 'HIGH');
+    } catch (error) {
+      console.error('Failed to start battle:', error);
+    }
+  };
+
+  const handleAttack = async () => {
+    if (!activeBattleId || !battleData || isResolving) return;
+
+    // Battle resolution happens on blockchain after BATTLE_PHASE duration
+    const battleDuration = Date.now() / 1000 - Number(battleData.startTime);
+    const BATTLE_PHASE_SECONDS = 30; // 30 seconds battle phase
+
+    if (battleDuration >= BATTLE_PHASE_SECONDS && !battleResolved) {
+      try {
+        await resolveBattle(activeBattleId);
+        setBattleResolved(true);
+        addTransaction('CLAIM_REWARDS', { battleId: Number(activeBattleId) }, 'HIGH');
+      } catch (error) {
+        console.error('Failed to resolve battle:', error);
+      }
+    }
   };
 
   const handleCollectSoul = () => {
     collectSoul();
     addTransaction('COLLECT_SOULS', { count: 1 }, 'MEDIUM');
-  };
-
-  const handleAttack = () => {
-    if (!battle) return;
-
-    const newOpponentHealth = Math.max(0, battle.opponentHealth - battle.playerDamage);
-    const newPlayerHealth = Math.max(0, battle.playerHealth - battle.opponentDamage);
-
-    setBattle({
-      ...battle,
-      opponentHealth: newOpponentHealth,
-      playerHealth: newPlayerHealth
-    });
-
-    takeDamage(battle.opponentDamage);
-
-    if (newOpponentHealth <= 0) {
-      setBattle({ ...battle, active: false, winner: address });
-      addTransaction('CLAIM_REWARDS', { winner: true }, 'HIGH');
-    } else if (newPlayerHealth <= 0) {
-      setBattle({ ...battle, active: false, winner: 'opponent' });
-      endSession();
-    }
   };
 
   const handleClaimRewards = () => {
@@ -126,13 +159,46 @@ export default function GameArena() {
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            {MOCK_ROOMS.map(room => (
-              <HauntedRoom
-                key={room.id}
-                room={room}
-                onExplore={() => handleStartSession(room.id)}
-              />
-            ))}
+            {AVAILABLE_ROOM_IDS.map(roomId => {
+              // Check if room is completed (in history)
+              const isCompleted = roomHistory?.includes(BigInt(roomId)) ?? false;
+              const isFirstClear = !isCompleted;
+              
+              const roomDescription = roomId === 1 ? 'Ancient tomes whisper secrets' :
+                                     roomId === 2 ? 'Ghostly dancers waltz eternally' :
+                                     roomId === 3 ? 'Shadows move with intent' :
+                                     roomId === 4 ? 'Cursed artifacts await' :
+                                     'Dark forces gather';
+              
+              // For now, we'll show generic data. In production, you'd fetch each room's data
+              // when the component mounts using multiple useReadContract hooks
+              const estimatedDifficulty = roomId;
+              const estimatedSouls = roomId * 15;
+              const estimatedPoints = roomId * 100;
+              
+              return (
+                <HauntedRoom
+                  key={roomId}
+                  room={{
+                    id: roomId,
+                    name: `Haunted Room ${roomId}`,
+                    difficulty: estimatedDifficulty,
+                    souls: estimatedSouls,
+                    explored: isCompleted,
+                    description: roomDescription,
+                    // Blockchain data (will be fetched when room is selected)
+                    basePoints: estimatedPoints,
+                    soulCount: estimatedSouls,
+                    enemyType: (roomId % 5) as number, // 0-4 enemy types
+                    hasChest: roomId % 2 === 0, // Even rooms have chests
+                    requiresPuzzle: roomId >= 3, // Rooms 3+ require puzzles
+                    isCompleted,
+                    isFirstClear,
+                  }}
+                  onExplore={() => handleStartSession(roomId)}
+                />
+              );
+            })}
           </div>
         </div>
       </div>
@@ -148,7 +214,20 @@ export default function GameArena() {
           {session.phase === 'EXPLORATION' && (
             <>
               <div>
-                {currentRoom && <HauntedRoom room={currentRoom} />}
+                {roomData ? (
+                  <div className="bg-bg-card border-2 border-border-color rounded-lg p-6">
+                    <h3 className="text-2xl header-font text-accent-orange mb-4">Room {Number(selectedRoomId)}</h3>
+                    <div className="space-y-2 ui-font">
+                      <p className="text-text-secondary">Difficulty: <span className="text-accent-orange">{roomData.difficulty}/5</span></p>
+                      <p className="text-text-secondary">Souls Available: <span className="text-accent-purple">{Number(roomData.soulCount)}</span></p>
+                      <p className="text-text-secondary">Enemy Type: <span className="text-accent-red">{roomData.enemyType}</span></p>
+                      {roomData.hasChest && <p className="text-success">💎 Contains Treasure Chest!</p>}
+                      {roomData.requiresPuzzle && <p className="text-warning">🧩 Puzzle Required</p>}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-text-secondary ui-font">Loading room data...</div>
+                )}
               </div>
               <div>
                 <SoulCollector souls={session.souls} onCollect={handleCollectSoul} />
@@ -158,7 +237,38 @@ export default function GameArena() {
 
           {session.phase === 'BATTLE' && (
             <div className="lg:col-span-2">
-              <BattleArena battle={battle || undefined} onAttack={handleAttack} />
+              {isStarting ? (
+                <div className="bg-bg-card border-2 border-accent-orange rounded-lg p-12 text-center">
+                  <div className="inline-block animate-spin rounded-full h-16 w-16 border-b-4 border-accent-orange mb-6"></div>
+                  <p className="text-xl text-text-secondary ui-font">Summoning enemy...</p>
+                  <p className="text-sm text-text-secondary/70 ui-font mt-2">Preparing battle arena</p>
+                </div>
+              ) : battleData && battleData.active ? (
+                <BattleArena 
+                  battle={{
+                    id: `battle-${activeBattleId}`,
+                    opponentHealth: Number(battleData.enemyPower),
+                    playerHealth: Number(battleData.playerPower),
+                    playerDamage: 10,
+                    opponentDamage: 15,
+                    active: true
+                  }} 
+                  onAttack={handleAttack} 
+                />
+              ) : battleData && !battleData.active ? (
+                <div className="bg-bg-card border-2 border-success rounded-lg p-12 text-center">
+                  <h3 className="text-3xl header-font text-success mb-4">
+                    {battleData.victory ? '🎉 Victory!' : '💀 Defeat'}
+                  </h3>
+                  <p className="text-xl text-text-secondary ui-font">
+                    {battleData.victory ? 'You defeated the enemy!' : 'You were defeated...'}
+                  </p>
+                </div>
+              ) : (
+                <div className="bg-bg-card border-2 border-border-color rounded-lg p-12 text-center">
+                  <p className="text-text-secondary ui-font">Loading battle data from blockchain...</p>
+                </div>
+              )}
             </div>
           )}
 
@@ -168,7 +278,7 @@ export default function GameArena() {
                 <h2 className="text-3xl font-bold header-font text-success mb-6">
                   Session Complete!
                 </h2>
-                <div className="grid grid-cols-2 gap-6 mb-8">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
                   <div>
                     <div className="text-4xl font-bold stat-font text-accent-orange mb-2">
                       {session.souls}
@@ -180,6 +290,18 @@ export default function GameArena() {
                       {session.points}
                     </div>
                     <div className="text-sm ui-font text-text-secondary">Points Earned</div>
+                  </div>
+                  <div>
+                    <div className="text-4xl font-bold stat-font text-success mb-2">
+                      {Number(battleStats.won)}
+                    </div>
+                    <div className="text-sm ui-font text-text-secondary">Battles Won</div>
+                  </div>
+                  <div>
+                    <div className="text-4xl font-bold stat-font text-text-secondary mb-2">
+                      {Number(battleStats.total)}
+                    </div>
+                    <div className="text-sm ui-font text-text-secondary">Total Battles</div>
                   </div>
                 </div>
                 <button

@@ -35,6 +35,30 @@ export const contractConfig = {
     address: CONTRACTS.BatchProcessor as `0x${string}`,
     abi: [] as const,
   },
+  spectralBattles: {
+    address: CONTRACTS.SpectralBattles as `0x${string}`,
+    abi: [] as const,
+  },
+  hauntedRooms: {
+    address: CONTRACTS.HauntedRooms as `0x${string}`,
+    abi: [] as const,
+  },
+  dailyQuests: {
+    address: CONTRACTS.DailyQuests as `0x${string}`,
+    abi: [] as const,
+  },
+  playerInventory: {
+    address: CONTRACTS.PlayerInventory as `0x${string}`,
+    abi: [] as const,
+  },
+  soulCollector: {
+    address: CONTRACTS.SoulCollector as `0x${string}`,
+    abi: [] as const,
+  },
+  gameState: {
+    address: CONTRACTS.GameState as `0x${string}`,
+    abi: [] as const,
+  },
 } as const;
 
 export type ContractName = keyof typeof contractConfig;

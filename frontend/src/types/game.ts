@@ -23,6 +23,14 @@ export interface Room {
   souls: number;
   explored: boolean;
   description: string;
+  // Blockchain data
+  basePoints?: number;
+  soulCount?: number;
+  enemyType?: number;
+  hasChest?: boolean;
+  requiresPuzzle?: boolean;
+  isCompleted?: boolean;
+  isFirstClear?: boolean;
 }
 
 export interface Battle {

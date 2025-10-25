@@ -47,11 +47,10 @@ contract DeployAndVerify is Script {
     }
     
     function run() external {
-        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
-        vm.startBroadcast(deployerPrivateKey);
+        vm.startBroadcast();
         
         console.log("=== Starting Somnia Screams Deployment ===");
-        console.log("Deployer:", vm.addr(deployerPrivateKey));
+        console.log("Deployer:", msg.sender);
         console.log("Chain ID:", block.chainid);
         
         Contracts memory c = deployAllContracts();
@@ -59,8 +58,8 @@ contract DeployAndVerify is Script {
         
         vm.stopBroadcast();
         
-        logDeployedAddresses(c);
-        saveDeploymentAddresses(c);
+    logDeployedAddresses(c);
+    saveDeploymentAddresses(c);
     }
     
     function deployAllContracts() private returns (Contracts memory c) {
@@ -184,37 +183,6 @@ contract DeployAndVerify is Script {
     }
     
     function saveDeploymentAddresses(Contracts memory c) private {
-        string memory part1 = string(abi.encodePacked(
-            '{\n',
-            '  "network": "somnia-testnet",\n',
-            '  "chainId": ', vm.toString(block.chainid), ',\n',
-            '  "deployedAt": "', vm.toString(block.timestamp), '",\n',
-            '  "contracts": {\n',
-            '    "SomniaScreams": "', vm.toString(c.somniaScreams), '",\n',
-            '    "HalloweenNFT": "', vm.toString(c.halloweenNFT), '",\n',
-            '    "Leaderboard": "', vm.toString(c.leaderboard), '",\n',
-            '    "LeaderboardReader": "', vm.toString(c.leaderboardReader), '",\n'
-        ));
-        
-        string memory part2 = string(abi.encodePacked(
-            '    "NFTRewards": "', vm.toString(c.nftRewards), '",\n',
-            '    "PlayerRegistry": "', vm.toString(c.playerRegistry), '",\n',
-            '    "PlayerProfile": "', vm.toString(c.playerProfile), '",\n',
-            '    "PlayerActions": "', vm.toString(c.playerActions), '",\n',
-            '    "HauntedRooms": "', vm.toString(c.hauntedRooms), '",\n'
-        ));
-        
-        string memory part3 = string(abi.encodePacked(
-            '    "SpectralBattles": "', vm.toString(c.spectralBattles), '",\n',
-            '    "SoulCollector": "', vm.toString(c.soulCollector), '",\n',
-            '    "BatchProcessor": "', vm.toString(c.batchProcessor), '",\n',
-            '    "PointsSystem": "', vm.toString(c.pointsSystem), '"\n',
-            '  }\n',
-            '}'
-        ));
-        
-        string memory json = string(abi.encodePacked(part1, part2, part3));
-        vm.writeFile("deployments/somnia-testnet.json", json);
-        console.log("\nDeployment addresses saved to deployments/somnia-testnet.json");
+        console.log("\nNOTE: Copy the above addresses into contract/deployments/somnia-testnet.json manually.");
     }
 }
