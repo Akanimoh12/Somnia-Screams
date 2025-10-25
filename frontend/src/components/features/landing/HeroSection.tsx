@@ -1,25 +1,204 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { useAccount } from 'wagmi';
-import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { Skull, Flame, Ghost, Sparkles } from 'lucide-react';
+import { Skull, Sparkles } from 'lucide-react';
 
 export default function HeroSection() {
   const navigate = useNavigate();
-  const { isConnected } = useAccount();
+
+  const handleEnterGame = () => {
+    console.log('Enter Game clicked, navigating to /dashboard');
+    navigate('/dashboard');
+  };
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-linear-to-b from-[#0a0a0a] via-[#1a1a1a] to-[#0a0a0a]">
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute top-20 left-10 animate-float">
-          <Ghost className="w-12 h-12 text-accent-orange" />
+      {/* Spooky Background Effects */}
+      <div className="absolute inset-0 opacity-30">
+        {/* Large Scary Skull - Top Left */}
+        <motion.div
+          animate={{ 
+            y: [0, -20, 0],
+            rotate: [-5, 5, -5],
+          }}
+          transition={{ 
+            duration: 4,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="absolute top-10 left-10 md:top-20 md:left-20"
+        >
+          <div className="relative">
+            <Skull className="w-32 h-32 md:w-48 md:h-48 text-accent-red drop-shadow-[0_0_30px_rgba(255,68,68,0.5)]" strokeWidth={1.5} />
+            <motion.div
+              animate={{ opacity: [0.5, 1, 0.5] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="absolute inset-0 blur-2xl bg-accent-red/30"
+            />
+          </div>
+        </motion.div>
+
+        {/* Large Pumpkin/Jack-o-lantern - Top Right */}
+        <motion.div
+          animate={{ 
+            y: [0, 20, 0],
+            rotate: [5, -5, 5],
+          }}
+          transition={{ 
+            duration: 5,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="absolute top-20 right-10 md:top-32 md:right-20"
+        >
+          <div className="relative text-8xl md:text-9xl">
+            🎃
+            <motion.div
+              animate={{ opacity: [0.3, 0.8, 0.3] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+              className="absolute inset-0 blur-3xl bg-accent-orange/40"
+            />
+          </div>
+        </motion.div>
+
+        {/* Ghost - Middle Left */}
+        <motion.div
+          animate={{ 
+            x: [-10, 10, -10],
+            y: [0, -15, 0],
+          }}
+          transition={{ 
+            duration: 3,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="absolute left-5 top-1/3 md:left-10"
+        >
+          <div className="relative text-6xl md:text-8xl opacity-80">
+            👻
+            <motion.div
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="absolute inset-0 blur-2xl bg-white/20"
+            />
+          </div>
+        </motion.div>
+
+        {/* Bat - Flying across */}
+        <motion.div
+          animate={{ 
+            x: ['-100%', '200vw'],
+            y: [0, -30, 0, 30, 0],
+          }}
+          transition={{ 
+            duration: 20,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+          className="absolute top-1/4 text-4xl md:text-6xl"
+        >
+          🦇
+        </motion.div>
+
+        {/* Spider Web - Top Right Corner */}
+        <div className="absolute top-0 right-0 text-6xl md:text-8xl opacity-60">
+          🕸️
         </div>
-        <div className="absolute top-40 right-20 animate-float-delayed">
-          <Skull className="w-16 h-16 text-accent-purple" />
-        </div>
-        <div className="absolute bottom-32 left-1/4 animate-float">
-          <Flame className="w-10 h-10 text-accent-red" />
-        </div>
+
+        {/* Scary Face - Bottom Left */}
+        <motion.div
+          animate={{ 
+            scale: [1, 1.1, 1],
+            rotate: [-2, 2, -2]
+          }}
+          transition={{ 
+            duration: 3,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="absolute bottom-20 left-10 md:bottom-32 md:left-20"
+        >
+          <div className="relative">
+            <Skull className="w-24 h-24 md:w-40 md:h-40 text-accent-purple drop-shadow-[0_0_25px_rgba(168,85,247,0.6)]" strokeWidth={1.5} />
+            <motion.div
+              animate={{ opacity: [0.4, 1, 0.4] }}
+              transition={{ duration: 2.5, repeat: Infinity }}
+              className="absolute inset-0 blur-xl bg-accent-purple/40"
+            />
+          </div>
+        </motion.div>
+
+        {/* Candy/Treat - Bottom Right */}
+        <motion.div
+          animate={{ 
+            y: [0, -10, 0],
+            rotate: [0, 10, 0]
+          }}
+          transition={{ 
+            duration: 2.5,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="absolute bottom-32 right-10 md:bottom-40 md:right-24 text-5xl md:text-7xl"
+        >
+          🍬
+        </motion.div>
+
+        {/* Witch Hat - Middle Right */}
+        <motion.div
+          animate={{ 
+            rotate: [-5, 5, -5],
+            y: [0, 10, 0]
+          }}
+          transition={{ 
+            duration: 4,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="absolute right-5 top-1/2 md:right-16 text-5xl md:text-7xl opacity-75"
+        >
+          🎩
+        </motion.div>
+
+        {/* Skull Emoji - Floating */}
+        <motion.div
+          animate={{ 
+            y: [0, -20, 0],
+            x: [-5, 5, -5]
+          }}
+          transition={{ 
+            duration: 3.5,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="absolute left-1/4 bottom-1/4 text-4xl md:text-6xl opacity-70"
+        >
+          💀
+        </motion.div>
+
+        {/* Floating Particles */}
+        {[...Array(20)].map((_, i) => (
+          <motion.div
+            key={i}
+            animate={{ 
+              y: [-20, -100],
+              opacity: [0, 1, 0],
+              scale: [0, 1, 0]
+            }}
+            transition={{ 
+              duration: Math.random() * 3 + 2,
+              repeat: Infinity,
+              delay: Math.random() * 5,
+              ease: "easeOut"
+            }}
+            className="absolute text-accent-orange"
+            style={{
+              left: `${Math.random() * 100}%`,
+              bottom: `${Math.random() * 30}%`,
+            }}
+          >
+            ✨
+          </motion.div>
+        ))}
       </div>
 
       <div className="container mx-auto px-4 z-10">
@@ -62,56 +241,23 @@ export default function HeroSection() {
             transition={{ delay: 0.8 }}
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
-            {isConnected ? (
-              <>
-                <button
-                  onClick={() => navigate('/dashboard')}
-                  className="group relative px-8 py-4 bg-accent-orange hover:bg-accent-red transition-all duration-300 rounded-lg ui-font font-bold text-lg overflow-hidden shadow-lg shadow-accent-orange/50 hover:shadow-accent-red/50"
-                >
-                  <span className="relative z-10 flex items-center gap-2">
-                    <Sparkles className="w-5 h-5" />
-                    Go to Dashboard
-                  </span>
-                  <div className="absolute inset-0 bg-linear-to-r from-accent-red to-accent-orange opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                </button>
+            <button
+              onClick={handleEnterGame}
+              className="group relative px-8 py-4 bg-accent-orange hover:bg-accent-red transition-all duration-300 rounded-lg ui-font font-bold text-lg overflow-hidden shadow-lg shadow-accent-orange/50 hover:shadow-accent-red/50"
+            >
+              <span className="relative z-10 flex items-center gap-2">
+                <Sparkles className="w-5 h-5" />
+                Enter Game
+              </span>
+              <div className="absolute inset-0 bg-linear-to-r from-accent-red to-accent-orange opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            </button>
 
-                <button
-                  onClick={() => navigate('/game')}
-                  className="group relative px-8 py-4 bg-accent-purple hover:bg-purple-600 transition-all duration-300 rounded-lg ui-font font-bold text-lg overflow-hidden shadow-lg shadow-accent-purple/50"
-                >
-                  <span className="relative z-10 flex items-center gap-2">
-                    <Flame className="w-5 h-5" />
-                    Play Now
-                  </span>
-                </button>
-              </>
-            ) : (
-              <>
-                <div className="transform hover:scale-105 transition-transform">
-                  <ConnectButton.Custom>
-                    {({ openConnectModal }) => (
-                      <button
-                        onClick={openConnectModal}
-                        className="group relative px-8 py-4 bg-accent-orange hover:bg-accent-red transition-all duration-300 rounded-lg ui-font font-bold text-lg overflow-hidden shadow-lg shadow-accent-orange/50 hover:shadow-accent-red/50"
-                      >
-                        <span className="relative z-10 flex items-center gap-2">
-                          <Sparkles className="w-5 h-5" />
-                          Connect Wallet
-                        </span>
-                        <div className="absolute inset-0 bg-linear-to-r from-accent-red to-accent-orange opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                      </button>
-                    )}
-                  </ConnectButton.Custom>
-                </div>
-
-                <button
-                  onClick={() => navigate('/how-to-play')}
-                  className="px-8 py-4 border-2 border-accent-orange hover:bg-accent-orange/10 transition-all duration-300 rounded-lg ui-font font-bold text-lg"
-                >
-                  How to Play
-                </button>
-              </>
-            )}
+            <button
+              onClick={() => navigate('/how-to-play')}
+              className="px-8 py-4 border-2 border-accent-orange hover:bg-accent-orange/10 transition-all duration-300 rounded-lg ui-font font-bold text-lg"
+            >
+              How to Play
+            </button>
           </motion.div>
 
           <motion.div

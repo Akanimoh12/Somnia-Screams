@@ -24,13 +24,26 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-bg-secondary border-t border-border-color mt-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <footer className="bg-bg-secondary border-t border-border-color mt-auto">
+      <div className="
+        w-full
+        px-4 py-8
+        sm:px-6 sm:py-10
+        lg:px-8 lg:py-12
+        max-w-7xl mx-auto
+      ">
+        {/* Main Footer Content - Responsive Grid */}
+        <div className="
+          grid gap-8
+          grid-cols-1
+          sm:grid-cols-2
+          lg:grid-cols-3
+        ">
+          {/* Column 1: About & Social Links */}
           <div>
             <h3 className="text-lg font-bold text-white ui-font mb-4">Somnia Screams</h3>
-            <p className="text-text-secondary text-sm ui-font mb-4">
-              A spooky Halloween mini-game on Somnia blockchain. Collect souls, battle spirits, and earn exclusive NFTs.
+            <p className="text-text-secondary text-sm ui-font mb-4 leading-relaxed">
+              A spooky Halloween mini-game on Somnia blockchain. Collect souls, battle spirits, and earn exclusive NFTs every 2 minutes.
             </p>
             <div className="flex items-center space-x-4">
               {socialLinks.map((social) => {
@@ -42,6 +55,7 @@ export default function Footer() {
                     target="_blank"
                     rel="noopener noreferrer"
                     whileHover={{ scale: 1.1, y: -2 }}
+                    whileTap={{ scale: 0.95 }}
                     className={`text-text-secondary ${social.color} transition-colors`}
                     aria-label={social.label}
                   >
@@ -52,6 +66,7 @@ export default function Footer() {
             </div>
           </div>
 
+          {/* Column 2: Contract Addresses with Copy */}
           <div>
             <h3 className="text-lg font-bold text-white ui-font mb-4">Contract Addresses</h3>
             <div className="space-y-3">
@@ -66,21 +81,28 @@ export default function Footer() {
                       hover:bg-bg-primary transition-colors
                       group
                     "
+                    title={`Copy ${contract.fullAddress}`}
                   >
                     <span className="text-white text-sm ui-font font-mono">
                       {contract.address}
                     </span>
-                    {copiedAddress === contract.fullAddress ? (
-                      <Check className="w-4 h-4 text-green-400" />
-                    ) : (
-                      <Copy className="w-4 h-4 text-text-muted group-hover:text-accent-orange transition-colors" />
-                    )}
+                    <motion.div
+                      initial={false}
+                      animate={copiedAddress === contract.fullAddress ? { scale: [1, 1.2, 1] } : {}}
+                    >
+                      {copiedAddress === contract.fullAddress ? (
+                        <Check className="w-4 h-4 text-green-400" />
+                      ) : (
+                        <Copy className="w-4 h-4 text-text-muted group-hover:text-accent-orange transition-colors" />
+                      )}
+                    </motion.div>
                   </button>
                 </div>
               ))}
             </div>
           </div>
 
+          {/* Column 3: Resources & Links */}
           <div>
             <h3 className="text-lg font-bold text-white ui-font mb-4">Resources</h3>
             <ul className="space-y-2">
@@ -89,10 +111,10 @@ export default function Footer() {
                   href="https://docs.somniascreams.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center space-x-2 text-text-secondary hover:text-accent-orange transition-colors text-sm ui-font"
+                  className="flex items-center space-x-2 text-text-secondary hover:text-accent-orange transition-colors text-sm ui-font group"
                 >
                   <span>Documentation</span>
-                  <ExternalLink className="w-3 h-3" />
+                  <ExternalLink className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                 </a>
               </li>
               <li>
@@ -100,10 +122,10 @@ export default function Footer() {
                   href="https://discord.gg/somniascreams"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center space-x-2 text-text-secondary hover:text-accent-orange transition-colors text-sm ui-font"
+                  className="flex items-center space-x-2 text-text-secondary hover:text-accent-orange transition-colors text-sm ui-font group"
                 >
-                  <span>Community</span>
-                  <ExternalLink className="w-3 h-3" />
+                  <span>Community Discord</span>
+                  <ExternalLink className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                 </a>
               </li>
               <li>
@@ -111,10 +133,10 @@ export default function Footer() {
                   href="https://somnia.network"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center space-x-2 text-text-secondary hover:text-accent-orange transition-colors text-sm ui-font"
+                  className="flex items-center space-x-2 text-text-secondary hover:text-accent-orange transition-colors text-sm ui-font group"
                 >
                   <span>Somnia Network</span>
-                  <ExternalLink className="w-3 h-3" />
+                  <ExternalLink className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                 </a>
               </li>
               <li>
@@ -122,27 +144,43 @@ export default function Footer() {
                   href="https://explorer.somnia.network"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center space-x-2 text-text-secondary hover:text-accent-orange transition-colors text-sm ui-font"
+                  className="flex items-center space-x-2 text-text-secondary hover:text-accent-orange transition-colors text-sm ui-font group"
                 >
                   <span>Block Explorer</span>
-                  <ExternalLink className="w-3 h-3" />
+                  <ExternalLink className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                 </a>
               </li>
             </ul>
           </div>
         </div>
 
+        {/* Bottom Bar - Copyright & Legal Links */}
         <div className="mt-8 pt-8 border-t border-border-color">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <p className="text-text-muted text-sm ui-font">
-              © 2025 Somnia Screams. All rights reserved.
+            <p className="text-text-muted text-sm ui-font text-center md:text-left">
+              © 2025 Somnia Screams. Built with 💀 on Somnia Devnet. All rights reserved.
             </p>
             <div className="flex items-center space-x-6 text-sm">
-              <a href="/privacy" className="text-text-secondary hover:text-accent-orange transition-colors ui-font">
+              <a 
+                href="/privacy" 
+                className="text-text-secondary hover:text-accent-orange transition-colors ui-font"
+              >
                 Privacy Policy
               </a>
-              <a href="/terms" className="text-text-secondary hover:text-accent-orange transition-colors ui-font">
+              <a 
+                href="/terms" 
+                className="text-text-secondary hover:text-accent-orange transition-colors ui-font"
+              >
                 Terms of Service
+              </a>
+              <a 
+                href="https://github.com/somniascreams" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-text-secondary hover:text-accent-orange transition-colors ui-font flex items-center space-x-1"
+              >
+                <Github className="w-4 h-4" />
+                <span>GitHub</span>
               </a>
             </div>
           </div>

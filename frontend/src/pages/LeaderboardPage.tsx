@@ -62,7 +62,7 @@ export default function LeaderboardPage() {
           </div>
 
           <button
-            onClick={refetch}
+            onClick={() => refetch()}
             disabled={loading}
             className="p-3 rounded-lg bg-secondary border-2 border-primary hover:border-warning transition disabled:opacity-50"
           >

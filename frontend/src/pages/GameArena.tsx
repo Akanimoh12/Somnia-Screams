@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAccount } from 'wagmi';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { Wallet } from 'lucide-react';
 import GameCanvas from '../components/game/GameCanvas';
 import PlayerHUD from '../components/game/PlayerHUD';
 import ActionPanel from '../components/game/ActionPanel';
@@ -21,13 +23,14 @@ const MOCK_ROOMS: Room[] = [
 
 export default function GameArena() {
   const navigate = useNavigate();
-  const { address } = useAccount();
+  const { address, isConnected } = useAccount();
   const { session, timeRemaining, startSession, collectSoul, takeDamage, endSession } = useGameSession();
   const { stats, fetchStats } = usePlayerStats();
   const { queue, addTransaction, clearQueue } = useTransactionQueue();
   
   const [currentRoom, setCurrentRoom] = useState<Room | null>(null);
   const [battle, setBattle] = useState<Battle | null>(null);
+  const [showConnectPrompt, setShowConnectPrompt] = useState(false);
 
   useEffect(() => {
     fetchStats();
@@ -47,11 +50,16 @@ export default function GameArena() {
   }, [session?.phase, battle, session?.health]);
 
   const handleStartSession = async (roomId: number) => {
+    if (!isConnected) {
+      setShowConnectPrompt(true);
+      return;
+    }
+
     const room = MOCK_ROOMS.find(r => r.id === roomId);
     if (!room) return;
 
     setCurrentRoom(room);
-    await startSession(roomId);
+    await startSession();
     addTransaction('START_SESSION', { roomId }, 'HIGH');
   };
 
@@ -95,6 +103,28 @@ export default function GameArena() {
           <h1 className="text-4xl font-bold title-font text-accent-orange text-center mb-12 glow-text">
             SELECT YOUR ROOM
           </h1>
+
+          {showConnectPrompt && (
+            <div className="bg-linear-to-br from-accent-orange/10 to-accent-purple/10 border-2 border-accent-orange/30 rounded-lg p-6 mb-8 max-w-2xl mx-auto">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 bg-accent-orange/20 rounded-lg">
+                    <Wallet className="w-6 h-6 text-accent-orange" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-white mb-1 ui-font">
+                      Connect Wallet to Play
+                    </h3>
+                    <p className="text-sm text-text-secondary ui-font">
+                      You need to connect your wallet to start a game session
+                    </p>
+                  </div>
+                </div>
+                <ConnectButton />
+              </div>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
             {MOCK_ROOMS.map(room => (
               <HauntedRoom

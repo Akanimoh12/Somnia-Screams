@@ -5,6 +5,8 @@ import HeroSection from '../components/features/landing/HeroSection';
 import Features from '../components/features/landing/Features';
 import HowToPlay from '../components/features/landing/HowToPlay';
 import GamePreview from '../components/features/landing/GamePreview';
+import GameStats from '../components/features/landing/GameStats';
+import LeaderboardPreview from '../components/features/landing/LeaderboardPreview';
 import Tokenomics from '../components/features/landing/Tokenomics';
 import CallToAction from '../components/features/landing/CallToAction';
 
@@ -20,6 +22,8 @@ export default function LandingPage() {
       >
         <HeroSection />
         <Features />
+        <GameStats />
+        <LeaderboardPreview />
         <HowToPlay />
         <GamePreview />
         <Tokenomics />

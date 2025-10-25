@@ -50,11 +50,11 @@ export const router = createBrowserRouter([
   },
   {
     path: ROUTES.DASHBOARD,
-    element: withLayout(Dashboard, true, true, false),
+    element: withLayout(Dashboard, false, true, false), // Allow access without wallet
   },
   {
     path: ROUTES.GAME,
-    element: withLayout(GameArena, true, false, false),
+    element: withLayout(GameArena, false, false, false), // Allow access without wallet
   },
   {
     path: ROUTES.LEADERBOARD,
@@ -62,11 +62,11 @@ export const router = createBrowserRouter([
   },
   {
     path: ROUTES.PROFILE,
-    element: withLayout(ProfilePage, true, true, false),
+    element: withLayout(ProfilePage, true, true, false), // Requires wallet - has user data
   },
   {
     path: ROUTES.INVENTORY,
-    element: withLayout(InventoryPage, true, true, false),
+    element: withLayout(InventoryPage, true, true, false), // Requires wallet - has user items
   },
   {
     path: ROUTES.ACHIEVEMENTS,
@@ -78,7 +78,7 @@ export const router = createBrowserRouter([
   },
   {
     path: ROUTES.SETTINGS,
-    element: withLayout(SettingsPage, true, true, false),
+    element: withLayout(SettingsPage, true, true, false), // Requires wallet - has user settings
   },
   {
     path: '*',

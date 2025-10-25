@@ -1,37 +1,96 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useAccount } from 'wagmi';
+import { useAccount, useWriteContract, useWatchContractEvent, useWaitForTransactionReceipt } from 'wagmi';
+import { CONTRACTS } from '../contracts/addresses';
+import { SomniaScreamsABI } from '../contracts/abis';
 import type { GameSession, GamePhase } from '../types/game';
 
 export function useGameSession() {
   const { address } = useAccount();
   const [session, setSession] = useState<GameSession | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [sessionId, setSessionId] = useState<bigint | null>(null);
 
-  const startSession = useCallback(async (roomId: number) => {
-    if (!address) return;
+  const { 
+    data: hash,
+    isPending: isStarting,
+    writeContract
+  } = useWriteContract();
+
+  const { isLoading: isConfirming } = useWaitForTransactionReceipt({
+    hash,
+  });
+
+  useWatchContractEvent({
+    address: CONTRACTS.SomniaScreams as `0x${string}`,
+    abi: SomniaScreamsABI,
+    eventName: 'SessionStarted',
+    onLogs: (logs) => {
+      logs.forEach((log: any) => {
+        if (log.args.player?.toLowerCase() === address?.toLowerCase()) {
+          const newSessionId = log.args.sessionId;
+          setSessionId(newSessionId);
+          
+          const newSession: GameSession = {
+            id: newSessionId.toString(),
+            player: address!,
+            startTime: Date.now(),
+            endTime: Date.now() + 120000,
+            points: 0,
+            souls: 0,
+            active: true,
+            phase: 'PRE_GAME',
+            roomId: 1,
+            health: 100,
+            maxHealth: 100,
+            battlePoints: 0
+          };
+          
+          setSession(newSession);
+        }
+      });
+    },
+  });
+
+  useWatchContractEvent({
+    address: CONTRACTS.SomniaScreams as `0x${string}`,
+    abi: SomniaScreamsABI,
+    eventName: 'SessionEnded',
+    onLogs: (logs) => {
+      logs.forEach((log: any) => {
+        if (log.args.player?.toLowerCase() === address?.toLowerCase()) {
+          setSession(prev => prev ? { ...prev, active: false } : null);
+        }
+      });
+    },
+  });
+
+  const startSession = useCallback(async () => {
+    if (!address || !CONTRACTS.SomniaScreams) return;
     
-    setLoading(true);
     try {
-      const newSession: GameSession = {
-        id: `session-${Date.now()}`,
-        player: address,
-        startTime: Date.now(),
-        endTime: Date.now() + 120000,
-        points: 0,
-        souls: 0,
-        active: true,
-        phase: 'PRE_GAME',
-        roomId,
-        health: 100,
-        maxHealth: 100,
-        battlePoints: 0
-      };
-      
-      setSession(newSession);
-    } finally {
-      setLoading(false);
+      writeContract({
+        address: CONTRACTS.SomniaScreams as `0x${string}`,
+        abi: SomniaScreamsABI,
+        functionName: 'startGameSession',
+      });
+    } catch (error) {
+      console.error('Failed to start session:', error);
     }
-  }, [address]);
+  }, [address, writeContract]);
+
+  const exitSession = useCallback(async () => {
+    if (!sessionId || !CONTRACTS.SomniaScreams) return;
+    
+    try {
+      writeContract({
+        address: CONTRACTS.SomniaScreams as `0x${string}`,
+        abi: SomniaScreamsABI,
+        functionName: 'exitSession',
+        args: [sessionId],
+      });
+    } catch (error) {
+      console.error('Failed to exit session:', error);
+    }
+  }, [sessionId, writeContract]);
 
   const updatePhase = useCallback((phase: GamePhase) => {
     setSession(prev => prev ? { ...prev, phase } : null);
@@ -59,8 +118,8 @@ export function useGameSession() {
   }, []);
 
   const endSession = useCallback(() => {
-    setSession(prev => prev ? { ...prev, active: false } : null);
-  }, []);
+    exitSession();
+  }, [exitSession]);
 
   useEffect(() => {
     if (!session?.active) return;
@@ -73,7 +132,7 @@ export function useGameSession() {
         endSession();
       } else if (elapsed < 30000) {
         updatePhase('PRE_GAME');
-      } else if (elapsed < 120000 - 30000) {
+      } else if (elapsed < 90000) {
         updatePhase('EXPLORATION');
       } else {
         updatePhase('BATTLE');
@@ -89,7 +148,7 @@ export function useGameSession() {
 
   return {
     session,
-    loading,
+    loading: isStarting || isConfirming,
     timeRemaining,
     startSession,
     updatePhase,
