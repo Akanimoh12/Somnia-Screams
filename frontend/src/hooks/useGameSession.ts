@@ -147,12 +147,15 @@ export function useGameSession() {
       throw new Error('Rewards already claimed for this session');
     }
 
+    // Get souls count from session
+    const souls = session?.souls || 0;
+
     try {
       claimWrite({
         address: CONTRACTS.SomniaScreams as `0x${string}`,
         abi: SomniaScreamsABI,
         functionName: 'claimSessionRewards',
-        args: [sessId],
+        args: [sessId, BigInt(souls)],
       });
     } catch (error) {
       console.error('Failed to claim rewards:', error);

@@ -94,10 +94,10 @@ export default function AchievementsPage() {
                   </h3>
                   <p className="text-secondary text-sm mb-3">{achievement.description}</p>
 
-                  {achievement.unlocked && achievement.timestamp && (
+                  {achievement.unlocked && achievement.unlockedAt && (
                     <div className="text-xs text-success">
                       Unlocked on{' '}
-                      {new Date(achievement.timestamp).toLocaleDateString('en-US', {
+                      {new Date(achievement.unlockedAt).toLocaleDateString('en-US', {
                         month: 'short',
                         day: 'numeric',
                         year: 'numeric',

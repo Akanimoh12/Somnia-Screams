@@ -155,9 +155,9 @@ export default function ProfilePage() {
                     <h3 className="font-bold text-white">{achievement.name}</h3>
                     <p className="text-sm text-secondary">{achievement.description}</p>
                   </div>
-                  {achievement.timestamp && (
+                  {achievement.unlockedAt && (
                     <div className="text-xs text-secondary">
-                      {formatDate(achievement.timestamp)}
+                      {formatDate(achievement.unlockedAt)}
                     </div>
                   )}
                 </motion.div>
