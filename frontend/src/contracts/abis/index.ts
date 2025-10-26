@@ -1,5 +1,6 @@
 // Contract ABIs for Somnia Screams
 export { PlayerProfileABI } from './PlayerProfileABI';
+export { PlayerRegistryABI } from './PlayerRegistryABI';
 export { LeaderboardABI } from './LeaderboardABI';
 export { HalloweenNFTABI } from './HalloweenNFTABI';
 export { SomniaScreamsABI } from './SomniaScreamsABI';
@@ -12,6 +13,7 @@ export { GameStateABI } from './GameStateABI';
 
 // Re-export for convenience
 export * from './PlayerProfileABI';
+export * from './PlayerRegistryABI';
 export * from './LeaderboardABI';
 export * from './HalloweenNFTABI';
 export * from './SomniaScreamsABI';

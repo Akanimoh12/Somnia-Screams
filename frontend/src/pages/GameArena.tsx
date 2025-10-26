@@ -10,11 +10,14 @@ import HauntedRoom from '../components/game/HauntedRoom';
 import SoulCollector from '../components/game/SoulCollector';
 import BattleArena from '../components/game/BattleArena';
 import TransactionQueue from '../components/web3/TransactionQueue';
+import RewardsSummaryModal from '../components/common/modals/RewardsSummaryModal';
 import { useGameSession } from '../hooks/useGameSession';
 import { usePlayerStats } from '../hooks/usePlayerStats';
 import { useTransactionQueue } from '../hooks/useTransactionQueue';
 import { useBattles } from '../hooks/useBattles';
 import { useRooms } from '../hooks/useRooms';
+import { useSoulCollection } from '../hooks/useSoulCollection';
+import { usePlayerRegistration } from '../hooks/usePlayerRegistration';
 
 // Available room IDs (1-50 based on MAX_ROOMS constant in contract)
 const AVAILABLE_ROOM_IDS = [1, 2, 3, 4, 5];
@@ -22,9 +25,30 @@ const AVAILABLE_ROOM_IDS = [1, 2, 3, 4, 5];
 export default function GameArena() {
   const navigate = useNavigate();
   const { address, isConnected } = useAccount();
-  const { session, timeRemaining, startSession, collectSoul } = useGameSession();
+  const { 
+    session, 
+    timeRemaining, 
+    startSession,
+    claimSessionRewards,
+    isClaiming,
+    isClaimSuccess,
+    claimError
+  } = useGameSession();
   const { stats, fetchStats } = usePlayerStats();
   const { queue, addTransaction, clearQueue } = useTransactionQueue();
+  const { checkAndShowRegistration } = usePlayerRegistration();
+  
+  // Soul collection system - batch souls to blockchain
+  const { 
+    queuedSouls, 
+    queuedPoints,
+    displayCount,
+    loading: isSoulProcessing,
+    isPending,
+    collectSoul: collectSoulToBlockchain,
+    submitBatch,
+    forceProcessBatch
+  } = useSoulCollection(session?.id ? BigInt(session.id) : null);
   
   // Real battle system from blockchain
   const { 
@@ -50,10 +74,22 @@ export default function GameArena() {
   const [currentRoomId, setCurrentRoomId] = useState<number | null>(null);
   const [showConnectPrompt, setShowConnectPrompt] = useState(false);
   const [battleResolved, setBattleResolved] = useState(false);
+  const [showRewardsModal, setShowRewardsModal] = useState(false);
 
   useEffect(() => {
     fetchStats();
   }, [fetchStats]);
+
+  // Handle successful reward claims
+  useEffect(() => {
+    if (isClaimSuccess && session) {
+      // Refetch player stats to show updated values
+      fetchStats();
+      
+      // Show rewards summary modal
+      setShowRewardsModal(true);
+    }
+  }, [isClaimSuccess, session, fetchStats]);
 
   // Auto-start battle when entering BATTLE phase and not already in battle
   useEffect(() => {
@@ -72,6 +108,12 @@ export default function GameArena() {
     if (!isConnected) {
       setShowConnectPrompt(true);
       return;
+    }
+
+    // Check if user needs to register/create profile
+    const needsRegistration = checkAndShowRegistration();
+    if (needsRegistration) {
+      return; // Stop here, modal will show
     }
 
     setCurrentRoomId(roomId);
@@ -120,13 +162,43 @@ export default function GameArena() {
   };
 
   const handleCollectSoul = () => {
-    collectSoul();
+    // Collect soul via blockchain hook (optimistic update + auto-batching)
+    collectSoulToBlockchain();
     addTransaction('COLLECT_SOULS', { count: 1 }, 'MEDIUM');
   };
 
-  const handleClaimRewards = () => {
-    addTransaction('CLAIM_REWARDS', { points: session?.points, souls: session?.souls }, 'CRITICAL');
-    setTimeout(() => navigate('/dashboard'), 2000);
+  const handleRewardsModalClose = () => {
+    setShowRewardsModal(false);
+    // Navigate to dashboard after modal closes
+    navigate('/dashboard');
+  };
+
+  const handleClaimRewards = async () => {
+    if (!session?.id) {
+      console.error('No active session to claim rewards for');
+      return;
+    }
+
+    // Force process any remaining queued souls before claiming rewards
+    if (queuedSouls > 0) {
+      try {
+        await forceProcessBatch();
+      } catch (error) {
+        console.error('Failed to process remaining souls:', error);
+      }
+    }
+    
+    try {
+      // Call contract to claim session rewards
+      const sessId = BigInt(session.id);
+      await claimSessionRewards(sessId);
+      
+      // Transaction submitted, UI will show loading state via isClaiming
+      addTransaction('CLAIM_REWARDS', { points: session?.points, souls: session?.souls }, 'CRITICAL');
+    } catch (error) {
+      console.error('Failed to claim rewards:', error);
+      // User will see error via claimError state
+    }
   };
 
   if (!session) {
@@ -230,7 +302,52 @@ export default function GameArena() {
                 )}
               </div>
               <div>
-                <SoulCollector souls={session.souls} onCollect={handleCollectSoul} />
+                <SoulCollector souls={displayCount} onCollect={handleCollectSoul} />
+                
+                {/* Queued Souls Indicator & Batch Submit */}
+                <div className="mt-4 bg-bg-card border-2 border-border-color rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <div className={`w-3 h-3 rounded-full ${isPending ? 'bg-warning animate-pulse' : 'bg-success'}`} />
+                      <span className="text-sm ui-font text-text-secondary">Queued for Batch:</span>
+                      <span className="text-lg font-bold stat-font text-accent-purple">
+                        {queuedSouls}/10
+                      </span>
+                    </div>
+                    {queuedPoints > 0 && (
+                      <span className="text-sm ui-font text-text-muted">
+                        +{queuedPoints} pts pending
+                      </span>
+                    )}
+                  </div>
+                  
+                  {queuedSouls > 0 && (
+                    <button
+                      onClick={submitBatch}
+                      disabled={isPending || isSoulProcessing}
+                      className={`w-full py-2 px-4 rounded-lg font-bold ui-font transition-all ${
+                        isPending || isSoulProcessing
+                          ? 'bg-bg-secondary text-text-muted cursor-not-allowed'
+                          : 'bg-accent-purple hover:bg-accent-purple/80 text-white hover:scale-105'
+                      }`}
+                    >
+                      {isPending || isSoulProcessing ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          Processing Batch...
+                        </span>
+                      ) : (
+                        `Submit Batch (${queuedSouls} souls)`
+                      )}
+                    </button>
+                  )}
+                  
+                  <p className="text-xs text-text-muted ui-font mt-2 text-center">
+                    {queuedSouls >= 10 
+                      ? '⚡ Auto-submit ready!' 
+                      : 'Collect 10 souls to auto-submit or submit manually'}
+                  </p>
+                </div>
               </div>
             </>
           )}
@@ -306,10 +423,30 @@ export default function GameArena() {
                 </div>
                 <button
                   onClick={handleClaimRewards}
-                  className="px-8 py-4 bg-success text-white font-bold ui-font rounded-lg hover:shadow-lg hover:shadow-success/50 transition-all"
+                  disabled={isClaiming}
+                  className={`px-8 py-4 font-bold ui-font rounded-lg transition-all ${
+                    isClaiming 
+                      ? 'bg-text-secondary cursor-not-allowed' 
+                      : 'bg-success text-white hover:shadow-lg hover:shadow-success/50'
+                  }`}
                 >
-                  Claim Rewards
+                  {isClaiming ? (
+                    <span className="flex items-center gap-2">
+                      <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      Claiming Rewards...
+                    </span>
+                  ) : (
+                    'Claim Rewards & Return'
+                  )}
                 </button>
+                {claimError && (
+                  <div className="mt-4 p-4 bg-danger/20 border border-danger rounded-lg">
+                    <p className="text-danger text-sm">{claimError.message || 'Failed to claim rewards. Please try again.'}</p>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -329,6 +466,18 @@ export default function GameArena() {
       </GameCanvas>
 
       <TransactionQueue transactions={queue} onClear={clearQueue} />
+
+      {/* Rewards Summary Modal */}
+      <RewardsSummaryModal
+        isOpen={showRewardsModal}
+        onClose={handleRewardsModalClose}
+        sessionData={{
+          souls: session?.souls || 0,
+          points: session?.points || 0,
+          battlesWon: Number(battleStats?.won || 0),
+          totalBattles: Number(battleStats?.total || 0),
+        }}
+      />
     </>
   );
 }

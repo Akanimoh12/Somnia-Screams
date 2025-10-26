@@ -42,5 +42,8 @@ export interface Achievement {
   name: string;
   description: string;
   unlocked: boolean;
-  timestamp?: number;
+  unlockedAt?: number; // Unix timestamp in milliseconds
+  timestampSource?: 'blockchain' | 'estimated'; // Indicates accuracy of timestamp
+  category?: 'battle' | 'souls' | 'exploration' | 'level' | 'nft' | 'session' | 'special';
+  requirement?: string;
 }

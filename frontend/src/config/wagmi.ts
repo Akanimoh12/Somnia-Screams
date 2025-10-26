@@ -7,3 +7,6 @@ export const wagmiConfig = getDefaultConfig({
   chains: [somniaDevnet],
   ssr: false,
 });
+
+// Export as 'config' for wagmi core functions
+export const config = wagmiConfig;

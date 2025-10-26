@@ -4,9 +4,13 @@ import type { NFT } from '../../../hooks/useNFTs';
 
 interface NFTCardProps {
   nft: NFT;
+  canUpgradeToSilver?: boolean;
+  canUpgradeToGold?: boolean;
+  onUpgrade?: (tokenId: string, newTier: 'SILVER' | 'GOLD') => void;
+  upgrading?: boolean;
 }
 
-export const NFTCard = ({ nft }: NFTCardProps) => {
+export const NFTCard = ({ nft, canUpgradeToSilver, canUpgradeToGold, onUpgrade, upgrading }: NFTCardProps) => {
   const tierColors = {
     BRONZE: 'from-amber-700 to-amber-900',
     SILVER: 'from-gray-400 to-gray-600',
@@ -24,6 +28,20 @@ export const NFTCard = ({ nft }: NFTCardProps) => {
     day: 'numeric',
     year: 'numeric',
   });
+
+  // Determine if upgrade is available
+  const canUpgrade = nft.tokenId && (
+    (nft.tierNum === 0 && canUpgradeToSilver) ||
+    (nft.tierNum === 1 && canUpgradeToGold)
+  );
+
+  const nextTier = nft.tierNum === 0 ? 'SILVER' : 'GOLD';
+
+  const handleUpgrade = () => {
+    if (nft.tokenId && onUpgrade && canUpgrade) {
+      onUpgrade(nft.tokenId, nextTier);
+    }
+  };
 
   return (
     <motion.div
@@ -63,6 +81,31 @@ export const NFTCard = ({ nft }: NFTCardProps) => {
             <div className="text-xs text-secondary bg-primary/10 rounded px-2 py-1">
               {nft.attributes.specialAbility}
             </div>
+          )}
+
+          {canUpgrade && nft.tierNum !== 2 && (
+            <motion.button
+              onClick={handleUpgrade}
+              disabled={upgrading}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className={`w-full mt-2 px-3 py-2 rounded-lg text-sm font-bold transition-all ${
+                upgrading 
+                  ? 'bg-primary/20 text-secondary cursor-not-allowed'
+                  : 'bg-gradient-to-r from-primary to-primary/80 text-white hover:from-primary/90 hover:to-primary/70'
+              }`}
+            >
+              {upgrading ? (
+                'Upgrading...'
+              ) : (
+                <span className="flex items-center justify-center gap-1">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                  </svg>
+                  Upgrade to {nextTier}
+                </span>
+              )}
+            </motion.button>
           )}
         </div>
       </div>

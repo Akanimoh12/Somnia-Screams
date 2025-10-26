@@ -1,61 +1,18 @@
 import { motion } from 'framer-motion';
 import { Trophy, Lock, Check } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import type { Achievement } from '../../../types/player';
+import { useState } from 'react';
+import { useAchievements } from '../../../hooks/useAchievements';
 
 export default function AchievementsList() {
-  const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const { 
+    achievements, 
+    unlockedCount, 
+    totalCount, 
+    progress, 
+    loading 
+  } = useAchievements();
+  
   const [filter, setFilter] = useState<'all' | 'unlocked' | 'locked'>('all');
-
-  useEffect(() => {
-    const fetchAchievements = () => {
-      const mockAchievements: Achievement[] = [
-        {
-          id: 1,
-          name: 'First Blood',
-          description: 'Win your first battle',
-          unlocked: true,
-          timestamp: Date.now() - 86400000
-        },
-        {
-          id: 2,
-          name: 'Soul Hunter',
-          description: 'Collect 100 souls',
-          unlocked: true,
-          timestamp: Date.now() - 172800000
-        },
-        {
-          id: 3,
-          name: 'Room Explorer',
-          description: 'Visit 10 different rooms',
-          unlocked: false
-        },
-        {
-          id: 4,
-          name: 'Warrior',
-          description: 'Win 10 battles',
-          unlocked: false
-        },
-        {
-          id: 5,
-          name: 'Soul Master',
-          description: 'Collect 1,000 souls',
-          unlocked: false
-        },
-        {
-          id: 6,
-          name: 'Manor Tourist',
-          description: 'Visit 25 rooms',
-          unlocked: false
-        }
-      ];
-      setAchievements(mockAchievements);
-    };
-
-    fetchAchievements();
-    const interval = setInterval(fetchAchievements, 30000);
-    return () => clearInterval(interval);
-  }, []);
 
   const filteredAchievements = achievements.filter(achievement => {
     if (filter === 'unlocked') return achievement.unlocked;
@@ -63,9 +20,21 @@ export default function AchievementsList() {
     return true;
   });
 
-  const unlockedCount = achievements.filter(a => a.unlocked).length;
-  const totalCount = achievements.length;
-  const progressPercent = (unlockedCount / totalCount) * 100;
+  if (loading) {
+    return (
+      <div className="bg-bg-card border-2 border-border-color rounded-lg p-6">
+        <div className="animate-pulse">
+          <div className="h-6 bg-bg-secondary rounded w-1/3 mb-6" />
+          <div className="h-3 bg-bg-secondary rounded w-full mb-6" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="h-24 bg-bg-secondary rounded" />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-bg-card border-2 border-border-color rounded-lg p-6">
@@ -82,13 +51,13 @@ export default function AchievementsList() {
         <div className="w-full bg-bg-secondary rounded-full h-3 mb-2">
           <motion.div
             initial={{ width: 0 }}
-            animate={{ width: `${progressPercent}%` }}
+            animate={{ width: `${progress}%` }}
             transition={{ duration: 1, ease: 'easeOut' }}
             className="bg-linear-to-r from-accent-purple to-accent-orange h-3 rounded-full"
           />
         </div>
         <div className="text-xs ui-font text-text-muted text-right">
-          {progressPercent.toFixed(0)}% Complete
+          {progress.toFixed(0)}% Complete
         </div>
       </div>
 
@@ -143,9 +112,25 @@ export default function AchievementsList() {
                 <p className="text-sm ui-font text-text-secondary mb-2">
                   {achievement.description}
                 </p>
-                {achievement.unlocked && achievement.timestamp && (
+                {achievement.unlocked && achievement.unlockedAt && (
+                  <div className="flex items-center gap-2">
+                    <p className="text-xs ui-font text-text-muted">
+                      Unlocked {new Date(achievement.unlockedAt).toLocaleDateString()}
+                    </p>
+                    {achievement.timestampSource && (
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${
+                        achievement.timestampSource === 'blockchain'
+                          ? 'bg-success/20 text-success'
+                          : 'bg-warning/20 text-warning'
+                      }`}>
+                        {achievement.timestampSource === 'blockchain' ? 'Exact' : 'Estimated'}
+                      </span>
+                    )}
+                  </div>
+                )}
+                {achievement.requirement && !achievement.unlocked && (
                   <p className="text-xs ui-font text-text-muted">
-                    Unlocked {new Date(achievement.timestamp).toLocaleDateString()}
+                    Requirement: {achievement.requirement}
                   </p>
                 )}
               </div>

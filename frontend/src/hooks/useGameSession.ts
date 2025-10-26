@@ -9,6 +9,7 @@ export function useGameSession() {
   const [session, setSession] = useState<GameSession | null>(null);
   const [sessionId, setSessionId] = useState<bigint | null>(null);
 
+  // Start session transaction
   const { 
     data: hash,
     isPending: isStarting,
@@ -17,6 +18,21 @@ export function useGameSession() {
 
   const { isLoading: isConfirming } = useWaitForTransactionReceipt({
     hash,
+  });
+
+  // Claim rewards transaction
+  const {
+    data: claimHash,
+    isPending: isClaimPending,
+    writeContract: claimWrite,
+    error: claimError,
+  } = useWriteContract();
+
+  const { 
+    isLoading: isClaimConfirming,
+    isSuccess: isClaimSuccess,
+  } = useWaitForTransactionReceipt({
+    hash: claimHash,
   });
 
   useWatchContractEvent({
@@ -121,6 +137,29 @@ export function useGameSession() {
     exitSession();
   }, [exitSession]);
 
+  const claimSessionRewards = useCallback(async (sessId: bigint) => {
+    if (!address || !CONTRACTS.SomniaScreams) {
+      throw new Error('Wallet not connected or contract not found');
+    }
+
+    // Check if session is already rewarded
+    if (session && session.id === sessId.toString() && (session as any).rewarded) {
+      throw new Error('Rewards already claimed for this session');
+    }
+
+    try {
+      claimWrite({
+        address: CONTRACTS.SomniaScreams as `0x${string}`,
+        abi: SomniaScreamsABI,
+        functionName: 'claimSessionRewards',
+        args: [sessId],
+      });
+    } catch (error) {
+      console.error('Failed to claim rewards:', error);
+      throw error;
+    }
+  }, [address, claimWrite, session]);
+
   useEffect(() => {
     if (!session?.active) return;
 
@@ -154,6 +193,11 @@ export function useGameSession() {
     updatePhase,
     collectSoul,
     takeDamage,
-    endSession
+    endSession,
+    claimSessionRewards,
+    isClaiming: isClaimPending || isClaimConfirming,
+    isClaimSuccess,
+    claimError,
+    claimHash,
   };
 }

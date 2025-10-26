@@ -7,7 +7,7 @@ import { MintNFTModal } from './MintNFTModal';
 import type { NFTTierRequirements } from '../../../hooks/useNFTs';
 
 export const NFTGallery = () => {
-  const { nfts, tierRequirements, loading, minting, mintNFT } = useNFTs();
+  const { nfts, tierRequirements, loading, minting, mintNFT, upgradeNFT, canUpgradeToSilver, canUpgradeToGold } = useNFTs();
   const [selectedTier, setSelectedTier] = useState<NFTTierRequirements | null>(null);
 
   if (loading) {
@@ -41,7 +41,14 @@ export const NFTGallery = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {nfts.map((nft) => (
-              <NFTCard key={nft.id} nft={nft} />
+              <NFTCard 
+                key={nft.id} 
+                nft={nft}
+                canUpgradeToSilver={canUpgradeToSilver}
+                canUpgradeToGold={canUpgradeToGold}
+                onUpgrade={upgradeNFT}
+                upgrading={minting}
+              />
             ))}
           </div>
         )}
