@@ -9,11 +9,13 @@ COMPREHENSIVE_AUDIT_AND_IMPLEMENTATION_GUIDE.md
 .env
 .env.local
 .env.*.local
+contract/.env
 
 # Private keys and secrets
 *.key
 *.pem
 secrets/
+
 
 # Build outputs
 **/out/

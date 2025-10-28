@@ -1,0 +1,36 @@
+{
+  "network": "Somnia Devnet",
+  "chainId": 50312,
+  "rpcUrl": "https://dream-rpc.somnia.network",
+  "explorerUrl": "https://explorer.somnia.network",
+  "deployedAt": "2025-10-28T22:00:00Z",
+  "deployer": "0x58C25c26666B31241C67Cf7B9a82e325eB07c342",
+  "contracts": {
+    "PlayerRegistry": "0xC1d8C25d95ff764ef7ac0Ef0720F76fAC0d2DF9B",
+    "PlayerProfile": "0xB74598f486B1f8eF4dd559E189FE8930A7858Ca3",
+    "PlayerInventory": "0x75DFEaa721D7b5D1F508a6CA3575228634e4d70B",
+    "PlayerActions": "0x9A4DF0980190d24abf73A23098CD9A036f70B197",
+    "HauntedRooms": "0xf12940401250F5f6368bC7F168014Cb3111584dd",
+    "SpectralBattles": "0x322AcEB7806c45D92Da7103889C6e2a5ce14bF28",
+    "SoulCollector": "0x55807aafc9115d6150C6f631FFdf3bCc46A965eA",
+    "DailyQuests": "0x7409e710F05AB90AdD03040aBbD9109F16381325",
+    "PointsSystem": "0xD47d026bE59700C1157246cd1A2c6176DB4D93Ef",
+    "Leaderboard": "0xcB64AE889514696a996584bb75C91b92BC7976ac",
+    "LeaderboardReader": "0x26962475A2611ba94b3b4A346c1daF72D2dfb8ea",
+    "NFTRewards": "0x1060B1111199d8Fb324bfd02494D16B87587A0A1",
+    "SeasonalRewards": "0xe0be11eDDF747e1630CF7520095D149C466D9C05",
+    "HalloweenNFT": "0x6DB4Aa66D172dE108471bD6fd4138D1131EF4dC1",
+    "NFTTiers": "0xFd6c0D28b92b32161A7cF469252CF578f831e38b",
+    "NFTMetadata": "0x2914C37dcA0cBf81bc31ebC3B74f753550ee0F2d",
+    "GameState": "0xB5D141FcAc6afECD8f123b506A91f535299853E4",
+    "GameSession": "0xD15028FC729fceEC2b0AaCB0CD5e4398E399238D",
+    "BatchProcessor": "0xB9464Df652988De8762CcF9A6e681fc3c2385950",
+    "SomniaScreams": "0x1742620cc894C1eCf53D7e7ECBa2244229CD811C"
+  },
+  "transactionHashes": {
+    "PlayerRegistry": "0x5442e1f24bda5200a16f1cfeac7f9d80f374ab863291fd59826f63ea38368fed",
+    "PlayerProfile": "0xa8d234d2e098bd78b3300b40e07fa1f928ea0c723d6fd329d4ab72501beafc48"
+  },
+  "status": "deployed",
+  "notes": "All 20 contracts deployed successfully. Initialization required."
+}
