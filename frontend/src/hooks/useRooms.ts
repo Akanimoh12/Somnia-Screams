@@ -74,18 +74,28 @@ export const useRooms = () => {
   const { writeContractAsync: generateRoom, isPending: isGenerating } = useWriteContract();
 
   const handleEnterRoom = async (roomId: bigint) => {
-    if (!address) return;
+    console.log('🚪 [useRooms] handleEnterRoom called');
+    console.log('🚪 [useRooms] roomId:', roomId.toString());
+    console.log('🚪 [useRooms] address:', address);
+    console.log('🚪 [useRooms] CONTRACTS.HauntedRooms:', CONTRACTS.HauntedRooms);
+    
+    if (!address) {
+      console.error('❌ [useRooms] No address available');
+      return;
+    }
 
     try {
-      await enterRoom({
+      console.log('📝 [useRooms] Calling contract enterRoom...');
+      const result = await enterRoom({
         address: CONTRACTS.HauntedRooms,
         abi: HauntedRoomsABI,
         functionName: 'enterRoom',
         args: [address, roomId],
       });
+      console.log('✅ [useRooms] enterRoom transaction result:', result);
       refetchRoomData();
     } catch (error) {
-      console.error('Failed to enter room:', error);
+      console.error('❌ [useRooms] Failed to enter room:', error);
       throw error;
     }
   };

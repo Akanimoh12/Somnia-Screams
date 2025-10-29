@@ -6,13 +6,15 @@ import { Web3Provider } from './contexts/Web3Context';
 import { GameProvider } from './contexts/GameContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { PlayerRegistrationProvider, usePlayerRegistrationContext } from './contexts/PlayerRegistrationContext';
 import { AppRouter } from './config/router';
-import { usePlayerRegistration } from './hooks/usePlayerRegistration';
 import '@rainbow-me/rainbowkit/styles.css';
 import './App.css';
 
 function AppContent() {
-  const { shouldShowModal, setShowModal } = usePlayerRegistration();
+  const { shouldShowModal, setShowModal } = usePlayerRegistrationContext();
+
+  console.log('🎭 [App] shouldShowModal:', shouldShowModal);
 
   return (
     <>
@@ -37,9 +39,11 @@ function App() {
       <Web3Provider>
         <ThemeProvider>
           <NotificationProvider>
-            <GameProvider>
-              <AppContent />
-            </GameProvider>
+            <PlayerRegistrationProvider>
+              <GameProvider>
+                <AppContent />
+              </GameProvider>
+            </PlayerRegistrationProvider>
           </NotificationProvider>
         </ThemeProvider>
       </Web3Provider>

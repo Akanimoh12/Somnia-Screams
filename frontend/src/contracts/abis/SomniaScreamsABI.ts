@@ -44,11 +44,6 @@ export const SomniaScreamsABI = [
         "internalType": "uint256",
         "name": "sessionId",
         "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "souls",
-        "type": "uint256"
       }
     ],
     "name": "claimSessionRewards",

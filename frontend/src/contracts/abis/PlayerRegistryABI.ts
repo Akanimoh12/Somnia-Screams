@@ -1,6 +1,13 @@
 export const PlayerRegistryABI = [
   {
     "type": "function",
+    "name": "register",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "isRegistered",
     "inputs": [
       { "name": "player", "type": "address", "internalType": "address" }
@@ -18,6 +25,26 @@ export const PlayerRegistryABI = [
     ],
     "outputs": [
       { "name": "", "type": "uint256", "internalType": "uint256" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getPlayerCount",
+    "inputs": [],
+    "outputs": [
+      { "name": "", "type": "uint256", "internalType": "uint256" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getPlayerByIndex",
+    "inputs": [
+      { "name": "index", "type": "uint256", "internalType": "uint256" }
+    ],
+    "outputs": [
+      { "name": "", "type": "address", "internalType": "address" }
     ],
     "stateMutability": "view"
   },

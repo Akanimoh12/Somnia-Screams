@@ -1,5 +1,0 @@
-# Somnia Screams - Deployed Contracts
-# Deployed on: Tue 28 Oct 2025 10:13:44 PM WAT
-# Network: Somnia Devnet (Chain ID: 50312)
-# Deployer: 0x58C25c26666B31241C67Cf7B9a82e325eB07c342
-

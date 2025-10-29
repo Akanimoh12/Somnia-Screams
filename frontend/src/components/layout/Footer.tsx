@@ -10,8 +10,10 @@ const socialLinks = [
 ];
 
 const contractAddresses = [
-  { label: 'Game Contract', address: '0x1234...5678', fullAddress: '0x1234567890abcdef1234567890abcdef12345678' },
-  { label: 'NFT Contract', address: '0xabcd...ef01', fullAddress: '0xabcdef0123456789abcdef0123456789abcdef01' },
+  { label: 'Main Game Contract', address: '0x1742...811C', fullAddress: '0x1742620cc894C1eCf53D7e7ECBa2244229CD811C' },
+  { label: 'Halloween NFT', address: '0x6DB4...4dC1', fullAddress: '0x6DB4Aa66D172dE108471bD6fd4138D1131EF4dC1' },
+  { label: 'Soul Collector', address: '0x5580...65eA', fullAddress: '0x55807aafc9115d6150C6f631FFdf3bCc46A965eA' },
+  { label: 'Leaderboard', address: '0xcB64...76ac', fullAddress: '0xcB64AE889514696a996584bb75C91b92BC7976ac' },
 ];
 
 export default function Footer() {

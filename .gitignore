@@ -10,6 +10,7 @@ COMPREHENSIVE_AUDIT_AND_IMPLEMENTATION_GUIDE.md
 .env.local
 .env.*.local
 contract/.env
+GAME_ANALYSIS.md
 
 # Private keys and secrets
 *.key

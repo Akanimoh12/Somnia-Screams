@@ -136,7 +136,15 @@ export default function HauntedRoom({ room, onExplore }: Readonly<HauntedRoomPro
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={onExplore}
+          onClick={() => {
+            console.log('🎯 [HauntedRoom] Button clicked for room:', room.id);
+            console.log('🎯 [HauntedRoom] onExplore function:', onExplore);
+            if (onExplore) {
+              onExplore();
+            } else {
+              console.error('❌ [HauntedRoom] onExplore is undefined!');
+            }
+          }}
           className="w-full bg-linear-to-r from-accent-orange to-accent-red text-white font-bold ui-font py-3 rounded-lg hover:shadow-lg hover:shadow-accent-orange/50 transition-all"
         >
           {room.isCompleted ? 'Re-explore' : 'Enter Room'}

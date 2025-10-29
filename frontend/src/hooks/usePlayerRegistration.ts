@@ -183,12 +183,22 @@ export const usePlayerRegistration = () => {
 
   // Function to check if registration is needed and show modal
   const checkAndShowRegistration = useCallback(() => {
+    console.log('🔍 [usePlayerRegistration] checkAndShowRegistration called');
+    console.log('🔍 [usePlayerRegistration] isConnected:', isConnected);
+    console.log('🔍 [usePlayerRegistration] isRegistered:', isRegistered);
+    console.log('🔍 [usePlayerRegistration] checkingRegistration:', checkingRegistration);
+    console.log('🔍 [usePlayerRegistration] getProfileCreatedFlag():', getProfileCreatedFlag());
+    console.log('🔍 [usePlayerRegistration] showModal:', showModal);
+    console.log('🔍 [usePlayerRegistration] shouldShowModal:', shouldShowModal);
+    
     if (isConnected && !isRegistered && !getProfileCreatedFlag()) {
+      console.log('✅ [usePlayerRegistration] Setting showModal to true');
       setShowModal(true);
       return true; // Registration needed
     }
+    console.log('✅ [usePlayerRegistration] Already registered or profile created');
     return false; // Already registered
-  }, [isConnected, isRegistered, getProfileCreatedFlag]);
+  }, [isConnected, isRegistered, getProfileCreatedFlag, showModal, shouldShowModal]);
 
   // Combined loading state
   const isLoading = 

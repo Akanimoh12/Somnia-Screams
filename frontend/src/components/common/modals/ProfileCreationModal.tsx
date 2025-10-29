@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Loader2, CheckCircle2, AlertCircle, Sparkles, Trophy, Skull } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import Confetti from 'react-confetti';
-import { usePlayerRegistration } from '../../../hooks/usePlayerRegistration';
+import { usePlayerRegistrationContext } from '../../../contexts/PlayerRegistrationContext';
 
 interface ProfileCreationModalProps {
   isOpen: boolean;
@@ -18,6 +18,8 @@ interface ProfileCreationModalProps {
 }
 
 export default function ProfileCreationModal({ isOpen, onClose, onSuccess }: ProfileCreationModalProps) {
+  console.log('🎭 [ProfileCreationModal] Render - isOpen:', isOpen);
+  
   const {
     register,
     isRegistering,
@@ -28,10 +30,14 @@ export default function ProfileCreationModal({ isOpen, onClose, onSuccess }: Pro
     registrationStep,
     registerHash,
     createProfileHash,
-  } = usePlayerRegistration();
+  } = usePlayerRegistrationContext();
 
   const [showConfetti, setShowConfetti] = useState(false);
   const [username, setUsername] = useState('');
+
+  console.log('🎭 [ProfileCreationModal] registrationStep:', registrationStep);
+  console.log('🎭 [ProfileCreationModal] isRegistering:', isRegistering);
+  console.log('🎭 [ProfileCreationModal] isCreatingProfile:', isCreatingProfile);
 
   // Show confetti on success
   useEffect(() => {

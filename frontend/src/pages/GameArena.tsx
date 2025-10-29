@@ -17,7 +17,7 @@ import { useTransactionQueue } from '../hooks/useTransactionQueue';
 import { useBattles } from '../hooks/useBattles';
 import { useRooms } from '../hooks/useRooms';
 import { useSoulCollection } from '../hooks/useSoulCollection';
-import { usePlayerRegistration } from '../hooks/usePlayerRegistration';
+import { usePlayerRegistrationContext } from '../contexts/PlayerRegistrationContext';
 
 // Available room IDs (1-50 based on MAX_ROOMS constant in contract)
 const AVAILABLE_ROOM_IDS = [1, 2, 3, 4, 5];
@@ -36,7 +36,7 @@ export default function GameArena() {
   } = useGameSession();
   const { stats, fetchStats } = usePlayerStats();
   const { queue, addTransaction, clearQueue } = useTransactionQueue();
-  const { checkAndShowRegistration } = usePlayerRegistration();
+  const { checkAndShowRegistration } = usePlayerRegistrationContext();
   
   // Soul collection system - batch souls to blockchain
   const { 
@@ -105,31 +105,50 @@ export default function GameArena() {
   }, [session?.phase, isInBattle, isStarting, currentRoomId, battleResolved]);
 
   const handleStartSession = async (roomId: number) => {
+    console.log('🎮 [GameArena] handleStartSession called with roomId:', roomId);
+    console.log('🎮 [GameArena] isConnected:', isConnected);
+    console.log('🎮 [GameArena] address:', address);
+    
     if (!isConnected) {
+      console.log('❌ [GameArena] Wallet not connected, showing prompt');
       setShowConnectPrompt(true);
       return;
     }
 
     // Check if user needs to register/create profile
+    console.log('✅ [GameArena] Checking registration...');
     const needsRegistration = checkAndShowRegistration();
+    console.log('🔍 [GameArena] needsRegistration:', needsRegistration);
+    
     if (needsRegistration) {
+      console.log('⚠️ [GameArena] Registration required, showing modal');
       return; // Stop here, modal will show
     }
 
+    console.log('✅ [GameArena] Setting up room and session...');
     setCurrentRoomId(roomId);
     setSelectedRoomId(BigInt(roomId));
     setBattleResolved(false);
     
     // Enter room on blockchain
     try {
+      console.log('📝 [GameArena] Calling enterRoom contract...');
       await enterRoom(BigInt(roomId));
+      console.log('✅ [GameArena] Room entered successfully');
       addTransaction('START_SESSION', { roomId }, 'HIGH');
     } catch (error) {
-      console.error('Failed to enter room:', error);
+      console.error('❌ [GameArena] Failed to enter room:', error);
+      return; // Stop if room entry fails
     }
     
     // Start game session
-    await startSession();
+    try {
+      console.log('🎲 [GameArena] Starting game session...');
+      await startSession();
+      console.log('✅ [GameArena] Game session started!');
+    } catch (error) {
+      console.error('❌ [GameArena] Failed to start session:', error);
+    }
   };
 
   const handleStartBattle = async (roomId: bigint) => {
